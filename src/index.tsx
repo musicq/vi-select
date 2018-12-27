@@ -1,7 +1,7 @@
 import { Dropdown, Input } from 'antd';
 import * as React from 'react';
 import { ChangeEvent } from 'react';
-import { BehaviorSubject, combineLatest, fromEvent, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { Vlist } from './Vlist';
 
@@ -45,13 +45,11 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
   constructor(props: any) {
     super(props);
 
-    this.onShow = this.onShow.bind(this);
     this.onInput = this.onInput.bind(this);
-    this.onClose = this.onClose.bind(this);
     this.onChange = this.onChange.bind(this);
+    this.onVisibleChange = this.onVisibleChange.bind(this);
   }
 
-  // 为了对比是否外界传入的参数变化，如果变化则改变内在的状态，外部优先
   static getDerivedStateFromProps<T>(props: IVSelectProps<T>, state: IVSelectState<T>) {
     const ns = {} as IVSelectState<T>;
 
@@ -75,17 +73,6 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
   }
 
   componentDidMount(): void {
-    this._sub.push(
-      fromEvent(document.body, 'click').subscribe(e => {
-        const clsList = Array.from((e.target as HTMLElement).classList);
-
-        // click elements except dropdown panel
-        if (!clsList.includes('ant-dropdown') && this.state.visible) {
-          this.setState({ visible: false });
-        }
-      })
-    );
-
     this.dataSource$ = combineLatest(this.state.dataSource$, this.state.value$).pipe(
       distinctUntilChanged(),
       map(([dataSource, value]) => dataSource.filter(
@@ -109,18 +96,24 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     this.setState({ visible: true, placeholder, value, lastValue });
   }
 
-  onClose(visible: boolean) {
-    if (!visible) {
-      const ns = {
-        visible: false,
-        placeholder: this.state.originPlaceholder,
-        // value not set, recover
-        // TODO current value is not valid(not exist in the list), reset it to the origin value
-        // TODO use searchKeyWord not value
-        value: this.state.value === undefined || this.state.value === '' ? this.state.lastValue : this.state.value
-      };
+  onClose() {
+    const ns = {
+      visible: false,
+      placeholder: this.state.originPlaceholder,
+      // value not set, recover
+      // TODO current value is not valid(not exist in the list), reset it to the origin value
+      // TODO use searchKeyWord not value
+      value: this.state.value === undefined || this.state.value === '' ? this.state.lastValue : this.state.value
+    };
 
-      return this.setState(ns);
+    return this.setState(ns);
+  }
+
+  onVisibleChange(visible: boolean) {
+    if (visible) {
+      this.onShow();
+    } else {
+      this.onClose();
     }
   }
 
@@ -134,7 +127,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
       this.props.onChange(v);
     }
 
-    this.setState({ value: v[this.props.searchField] });
+    this.setState({ visible: false, value: v[this.props.searchField] });
   }
 
   render() {
@@ -151,13 +144,12 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
         )}
         trigger={['click']}
         visible={this.state.visible}
-        onVisibleChange={this.onClose}
+        onVisibleChange={this.onVisibleChange}
       >
         <Input
           placeholder={this.state.placeholder}
           value={this.state.value}
           onChange={this.onInput}
-          onClick={this.onShow}
         />
       </Dropdown>
     );
