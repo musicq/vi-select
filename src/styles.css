@@ -1,8 +1,14 @@
-/* add css styles here (optional) */
+.VlistItem {
+  padding: 5px 12px;
+  cursor: pointer;
+}
 
-.test {
-  display: inline-block;
-  margin: 2em auto;
-  border: 2px solid #000;
-  font-size: 2em;
+.VlistItem:hover {
+  background: #e4e1f0;
+}
+
+.VListItem.activated {
+  background-color: #fafafa;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.65);
 }
