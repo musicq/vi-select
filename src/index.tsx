@@ -13,9 +13,10 @@ interface IVSelectProps {
 interface IVSelectState {
   visible: boolean;
   placeholder: string | undefined;
-  value: string | undefined;
-  originValue: string | undefined;
-  originPlaceholder: string | undefined;
+  value: any | undefined;
+  originValue: any | undefined;
+  originPlaceholder: any | undefined;
+  lastValue: any | undefined;
 }
 
 export class VSelect extends React.Component<IVSelectProps, IVSelectState> {
@@ -25,7 +26,8 @@ export class VSelect extends React.Component<IVSelectProps, IVSelectState> {
     value: undefined,
 
     originValue: undefined,
-    originPlaceholder: undefined
+    originPlaceholder: undefined,
+    lastValue: undefined
   };
 
   constructor(props: any) {
@@ -33,8 +35,10 @@ export class VSelect extends React.Component<IVSelectProps, IVSelectState> {
 
     this.onShow = this.onShow.bind(this);
     this.onInput = this.onInput.bind(this);
+    this.onClose = this.onClose.bind(this);
   }
 
+  // 为了对比是否外界传入的参数变化，如果变化则改变内在的状态，外部优先
   static getDerivedStateFromProps(props: IVSelectProps, state: IVSelectState) {
     const ns = {} as IVSelectState;
 
@@ -52,15 +56,37 @@ export class VSelect extends React.Component<IVSelectProps, IVSelectState> {
   }
 
   componentDidMount(): void {
-    fromEvent(document.body, 'click').subscribe(() => {
-      if (this.state.visible) {
+    fromEvent(document.body, 'click').subscribe(e => {
+      const clsList = Array.from((e.target as HTMLElement).classList);
+
+      // click elements except dropdown panel
+      if (!clsList.includes('ant-dropdown') && this.state.visible) {
         this.setState({ visible: false });
       }
     });
   }
 
   onShow() {
-    this.setState({ visible: true });
+    const lastValue = this.state.value;
+    const placeholder = lastValue === undefined ? this.state.placeholder : lastValue;
+    const value = undefined;
+
+    this.setState({ visible: true, placeholder, value, lastValue });
+  }
+
+  onClose(visible: boolean) {
+    if (!visible) {
+      const ns = {
+        visible: false,
+        placeholder: this.state.originPlaceholder,
+        // value not set, recover
+        // TODO current value is not valid(not exist in the list), reset it to the origin value
+        // TODO use searchKeyWord not value
+        value: this.state.value === undefined || this.state.value === '' ? this.state.lastValue : this.state.value
+      };
+
+      return this.setState(ns);
+    }
   }
 
   onInput(e: ChangeEvent) {
@@ -69,7 +95,7 @@ export class VSelect extends React.Component<IVSelectProps, IVSelectState> {
 
   render() {
     return (
-      <Dropdown overlay={<Vlist/>} visible={this.state.visible}>
+      <Dropdown overlay={<Vlist/>} trigger={['click']} visible={this.state.visible} onVisibleChange={this.onClose}>
         <Input
           placeholder={this.state.placeholder}
           value={this.state.value}
