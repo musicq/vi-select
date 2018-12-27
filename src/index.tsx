@@ -140,7 +140,15 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
   render() {
     return (
       <Dropdown
-        overlay={<Vlist data$={this.dataSource$} children={this.props.children} onChange={this.onChange}/>}
+        overlay={(
+          <Vlist
+            data$={this.dataSource$}
+            children={this.props.children}
+            searchField={this.props.searchField}
+            value={this.state.lastValue}
+            onChange={this.onChange}
+          />
+        )}
         trigger={['click']}
         visible={this.state.visible}
         onVisibleChange={this.onClose}

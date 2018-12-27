@@ -7,8 +7,12 @@
   background: #e4e1f0;
 }
 
-.VListItem.activated {
+.VListItemActivated {
   background-color: #fafafa;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.65);
+}
+
+.VListItemActivated:hover {
+  background-color: #fafafa;
 }

@@ -5,7 +5,9 @@ import style from './styles.css';
 
 interface IVlistProps<T> {
   data$: Observable<T[]>;
+  value: any;
   onChange: (v: T) => void;
+  searchField: string;
 }
 
 export class Vlist<T> extends React.Component<IVlistProps<T>> {
@@ -28,7 +30,12 @@ export class Vlist<T> extends React.Component<IVlistProps<T>> {
           style={{ height: 400 }}
         >
           {(item: T) => (
-            <div className={style.VlistItem} onClick={() => this.onSelect(item)}>
+            <div
+              className={item[this.props.searchField] === this.props.value
+                ? style.VListItemActivated + ' ' + style.VlistItem
+                : style.VlistItem}
+              onClick={() => this.onSelect(item)}
+            >
               {(this.props.children as any)(item)}
             </div>
           )}
