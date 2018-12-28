@@ -1,3 +1,4 @@
+/* Vlist style */
 .VlistItem {
   padding: 5px 12px;
   cursor: pointer;
@@ -15,4 +16,16 @@
 
 .VListItemActivated:hover {
   background-color: #fafafa;
+}
+
+/* Select */
+.VSelectInput {
+  padding: 0;
+}
+
+.VSelectInput:focus,
+.VSelectInput:hover {
+  border: 0;
+  outline: 0;
+  box-shadow: none;
 }
