@@ -1,21 +1,24 @@
 import { Dropdown, Icon, Input } from 'antd';
 import * as React from 'react';
 import { ChangeEvent } from 'react';
+import { Subject, Subscription } from 'rxjs';
 import style from './styles.css';
 
 interface IVSelectProps<T> {
   placeholder?: string;
-  value?: string;
+  value?: string | number | undefined;
   onChange?: Function;
   dataSource: T[];
-  searchField: string;
+  // use to identify which property should be used as value
+  keyProp: keyof T;
 }
 
 interface IVSelectState<T> {
-  value: T | undefined;
+  value: string | number | undefined;
   isEdit: boolean;
   visible: boolean;
-  changingValue: T | undefined;
+  changingValue: string | undefined;
+  dataSource: T[] | undefined;
 }
 
 export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<T>> {
@@ -23,10 +26,13 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     value: undefined,
     isEdit: false,
     visible: false,
-    changingValue: undefined
+    changingValue: undefined,
+    dataSource: undefined
   };
 
+  private _sub: Subscription[] = [];
   private inputRef = React.createRef<Input>();
+  private changingValue$ = new Subject<string>();
 
   constructor(props: any) {
     super(props);
@@ -36,13 +42,27 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
   }
 
   static getDerivedStateFromProps<T>(props: IVSelectProps<T>, state: IVSelectState<T>) {
+    const newState = {} as IVSelectState<T>;
+
     if (props.value !== state.value) {
-      return {
-        value: props.value
-      };
+      newState.value = props.value;
     }
 
-    return null;
+    if (props.dataSource !== state.dataSource) {
+      newState.dataSource = state.dataSource;
+    }
+
+    return newState;
+  }
+
+  componentDidMount(): void {
+    this._sub.push(
+      this.changingValue$.subscribe(v => this.setState({ changingValue: v }))
+    );
+  }
+
+  componentWillUnmount(): void {
+    this._sub.forEach(s => s.unsubscribe());
   }
 
   render() {
@@ -112,6 +132,6 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
   }
 
   private onInput(e: ChangeEvent) {
-    this.setState({ changingValue: (e.target as any).value });
+    this.changingValue$.next((e.target as any).value);
   }
 }
