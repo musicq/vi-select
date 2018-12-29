@@ -7,7 +7,7 @@ import data from './data.json';
 export default class App extends Component {
   state = {
     placeholder: '搜索框',
-    value: ''
+    value: '00101742'
   };
 
   render() {
@@ -29,7 +29,7 @@ export default class App extends Component {
           placeholder={this.state.placeholder}
           value={this.state.value}
           dataSource={data}
-          keyProp="dealer_product_name"
+          keyProp="dealer_id"
           style={{ width: 300 }}
         >
           {item => (
