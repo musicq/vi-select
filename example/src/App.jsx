@@ -38,6 +38,7 @@ export default class App extends Component {
           keyProp="dealer_id"
           displayProp="dealer_product_name"
           onChange={this.onChange}
+          itemHeight={90}
           style={{ width: 300 }}
         >
           {item => (

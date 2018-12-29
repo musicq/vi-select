@@ -8,6 +8,7 @@ interface IVlistProps<T> {
   value: any;
   onChange: (v: T) => void;
   keyProp: any;
+  itemHeight?: number;
 }
 
 export class Vlist<T> extends React.Component<IVlistProps<T>> {
@@ -26,15 +27,18 @@ export class Vlist<T> extends React.Component<IVlistProps<T>> {
   }
 
   render() {
+    const itemHeight = this.props.itemHeight || 32;
+
     return (
       <div className="ant-dropdown-menu">
         <VirtualList
           data$={this.props.data$}
-          options$={of({ height: 90 })}
+          options$={of({ height: itemHeight })}
           style={{ height: 400 }}
         >
           {(item: T) => (
             <div
+              style={{ height: itemHeight }}
               className={
                 (this.props.keyProp ? item[this.props.keyProp] : item) === this.props.value
                   ? Vlist.getActivatedClassName()

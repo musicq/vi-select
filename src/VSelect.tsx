@@ -17,6 +17,8 @@ interface IVSelectProps<T> {
   displayProp: keyof T;
   style?: any;
   className?: string;
+  // for vist, default is 32px
+  itemHeight?: number;
 }
 
 interface IVSelectState<T> {
@@ -124,6 +126,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
             children={this.props.children}
             keyProp={this.props.keyProp}
             value={this.state.realValue}
+            itemHeight={this.props.itemHeight}
             onChange={this.onChange}
           />
         }
