@@ -36,7 +36,9 @@ export class Vlist<T> extends React.Component<IVlistProps<T>> {
           {(item: T) => (
             <div
               className={
-                item[this.props.keyProp] === this.props.value ? Vlist.getActivatedClassName() : style.VlistItem
+                (this.props.keyProp ? item[this.props.keyProp] : item) === this.props.value
+                  ? Vlist.getActivatedClassName()
+                  : style.VlistItem
               }
               onClick={() => this.onSelect(item)}
             >

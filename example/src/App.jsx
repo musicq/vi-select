@@ -4,10 +4,16 @@ import React, { Component } from 'react';
 import { VSelect } from 'v-select';
 import data from './data.json';
 
+const array = new Array(100).fill(0).map((_, i) => i);
+
 export default class App extends Component {
   state = {
     placeholder: '搜索框',
     value: '00101742'
+  };
+
+  onChange = e => {
+    console.log('You selected', e);
   };
 
   render() {
@@ -30,6 +36,8 @@ export default class App extends Component {
           value={this.state.value}
           dataSource={data}
           keyProp="dealer_id"
+          displayProp="dealer_product_name"
+          onChange={this.onChange}
           style={{ width: 300 }}
         >
           {item => (
@@ -40,6 +48,14 @@ export default class App extends Component {
               <div>{item.signed}</div>
             </div>
           )}
+        </VSelect>
+
+        <VSelect
+          dataSource={array}
+          onChange={this.onChange}
+          style={{ width: 300, marginTop: 20 }}
+        >
+          {item => <p>{item}</p>}
         </VSelect>
       </div>
     );

@@ -13,11 +13,14 @@ interface IVSelectProps<T> {
   dataSource: T[];
   // use to identify which property should be used as value
   keyProp: keyof T;
+  // which field to show in the input box
+  displayProp: keyof T;
   style?: any;
   className?: string;
 }
 
 interface IVSelectState<T> {
+  // display value
   value: string | number | undefined;
   isEdit: boolean;
   visible: boolean;
@@ -25,6 +28,8 @@ interface IVSelectState<T> {
   dataSource: T[] | undefined;
   dataSource$: BehaviorSubject<T[]>;
   inputValue: string | number | undefined;
+  // real value
+  realValue: string | number | undefined;
 }
 
 export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<T>> {
@@ -35,7 +40,8 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     changingValue: undefined,
     dataSource: undefined,
     dataSource$: new BehaviorSubject<T[]>([]),
-    inputValue: undefined
+    inputValue: undefined,
+    realValue: undefined
   };
 
   private _sub: Subscription[] = [];
@@ -57,7 +63,8 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     // if props value has change, then change the state value
     if (props.value !== state.inputValue) {
       state.inputValue = props.value;
-      state.value = props.value;
+      state.realValue = props.value;
+      state.value = VSelect.transValue<T>(props.value, props.dataSource, props.keyProp, props.displayProp);
     }
 
     if (props.dataSource !== state.dataSource) {
@@ -68,6 +75,25 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     return newState;
   }
 
+  // transform value
+  private static transValue<T>(
+    value: string | number | undefined,
+    dataSource: T[],
+    keyProp: keyof T,
+    displayProp: keyof T
+  ): string | number | undefined {
+    const item = dataSource.find(source => {
+      const x = keyProp ? source[keyProp] : source;
+      return (x as any) === value;
+    });
+
+    if (item === undefined) {
+      return item;
+    }
+
+    return (displayProp ? item[displayProp] : item) as any;
+  }
+
   componentDidMount(): void {
     this._sub.push(
       this.changingValue$.subscribe(v => this.setState({ changingValue: v }))
@@ -75,8 +101,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
 
     this.data$ = combineLatest(this.state.dataSource$, this.changingValue$).pipe(
       map(([dataSource, changingValue]) => changingValue ? dataSource.filter(source => {
-        const item = this.props.keyProp ? source[this.props.keyProp] : source;
-
+        const item = this.props.displayProp ? source[this.props.displayProp] : source;
         return item.toString().toLowerCase().includes(changingValue.toString().toLowerCase());
       }) : dataSource)
     );
@@ -87,8 +112,8 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
   }
 
   render() {
-    const isShowPlaceholder = this.state.value || this.state.changingValue ? 'none' : 'block';
-    const isShowValuePlaceholder = this.state.value && !this.state.changingValue ? 'block' : 'none';
+    const isShowPlaceholder = this.state.value !== undefined || this.state.changingValue ? 'none' : 'block';
+    const isShowValuePlaceholder = this.state.value !== undefined && !this.state.changingValue ? 'block' : 'none';
     const isShowInput = this.state.isEdit ? 'block' : 'none';
 
     return (
@@ -98,7 +123,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
             data$={this.data$}
             children={this.props.children}
             keyProp={this.props.keyProp}
-            value={this.state.value}
+            value={this.state.realValue}
             onChange={this.onChange}
           />
         }
@@ -167,13 +192,16 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
   }
 
   private onChange(v: T) {
-    const value = this.props.keyProp ? v[this.props.keyProp] : v;
-
-    this.setState({ value: value as any });
-    this.changingValue$.next('');
+    // use to output
+    const output = this.props.keyProp ? v[this.props.keyProp] : v;
+    // use to display
+    const value = this.props.displayProp ? v[this.props.displayProp] : v;
 
     if (this.props.onChange) {
-      this.props.onChange(value);
+      this.props.onChange(output);
     }
+
+    this.setState({ value: value as any, realValue: output as any });
+    this.changingValue$.next('');
   }
 }
