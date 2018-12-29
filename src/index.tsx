@@ -1,8 +1,8 @@
 import { Dropdown, Icon, Input } from 'antd';
 import * as React from 'react';
 import { ChangeEvent } from 'react';
-import { BehaviorSubject, combineLatest, Observable, Subject, Subscription } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 import style from './styles.css';
 import { Vlist } from './Vlist';
 
@@ -21,7 +21,7 @@ interface IVSelectState<T> {
   visible: boolean;
   changingValue: string | undefined;
   dataSource: T[] | undefined;
-  dataSource$: Subject<T[]>;
+  dataSource$: BehaviorSubject<T[]>;
   inputValue: string | number | undefined;
 }
 
@@ -38,7 +38,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
 
   private _sub: Subscription[] = [];
   private inputRef = React.createRef<Input>();
-  private changingValue$ = new Subject<string>();
+  private changingValue$ = new BehaviorSubject<string>('');
   private data$: Observable<T[]>;
 
   constructor(props: any) {
@@ -71,7 +71,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
       this.changingValue$.subscribe(v => this.setState({ changingValue: v }))
     );
 
-    this.data$ = combineLatest(this.state.dataSource$, this.changingValue$.pipe(startWith(''))).pipe(
+    this.data$ = combineLatest(this.state.dataSource$, this.changingValue$).pipe(
       map(([dataSource, changingValue]) => changingValue ? dataSource.filter(source => {
         const item = this.props.keyProp ? source[this.props.keyProp] : source;
 
@@ -152,7 +152,9 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
       }
       this.setState({ isEdit: true });
     } else {
-      this.setState({ isEdit: false, changingValue: undefined });
+      // clear temp value
+      this.changingValue$.next('');
+      this.setState({ isEdit: false });
     }
 
     this.setState({ visible });
