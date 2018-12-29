@@ -1,8 +1,10 @@
 import { Dropdown, Icon, Input } from 'antd';
 import * as React from 'react';
 import { ChangeEvent } from 'react';
-import { Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subject, Subscription } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
 import style from './styles.css';
+import { Vlist } from './Vlist';
 
 interface IVSelectProps<T> {
   placeholder?: string;
@@ -19,6 +21,8 @@ interface IVSelectState<T> {
   visible: boolean;
   changingValue: string | undefined;
   dataSource: T[] | undefined;
+  dataSource$: Subject<T[]>;
+  inputValue: string | number | undefined;
 }
 
 export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<T>> {
@@ -27,29 +31,36 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     isEdit: false,
     visible: false,
     changingValue: undefined,
-    dataSource: undefined
+    dataSource: undefined,
+    dataSource$: new BehaviorSubject<T[]>([]),
+    inputValue: undefined
   };
 
   private _sub: Subscription[] = [];
   private inputRef = React.createRef<Input>();
   private changingValue$ = new Subject<string>();
+  private data$: Observable<T[]>;
 
   constructor(props: any) {
     super(props);
 
     this.onVisibleChange = this.onVisibleChange.bind(this);
     this.onInput = this.onInput.bind(this);
+    this.onChange = this.onChange.bind(this);
   }
 
   static getDerivedStateFromProps<T>(props: IVSelectProps<T>, state: IVSelectState<T>) {
     const newState = {} as IVSelectState<T>;
 
-    if (props.value !== state.value) {
-      newState.value = props.value;
+    // if props value has change, then change the state value
+    if (props.value !== state.inputValue) {
+      state.inputValue = props.value;
+      state.value = props.value;
     }
 
     if (props.dataSource !== state.dataSource) {
-      newState.dataSource = state.dataSource;
+      newState.dataSource = props.dataSource;
+      state.dataSource$.next(props.dataSource);
     }
 
     return newState;
@@ -58,6 +69,14 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
   componentDidMount(): void {
     this._sub.push(
       this.changingValue$.subscribe(v => this.setState({ changingValue: v }))
+    );
+
+    this.data$ = combineLatest(this.state.dataSource$, this.changingValue$.pipe(startWith(''))).pipe(
+      map(([dataSource, changingValue]) => changingValue ? dataSource.filter(source => {
+        const item = this.props.keyProp ? source[this.props.keyProp] : source;
+
+        return item.toString().toLowerCase().includes(changingValue.toString().toLowerCase());
+      }) : dataSource)
     );
   }
 
@@ -72,7 +91,15 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
 
     return (
       <Dropdown
-        overlay={<div>Dropdown</div>}
+        overlay={
+          <Vlist
+            data$={this.data$}
+            children={this.props.children}
+            keyProp={this.props.keyProp}
+            value={this.state.value}
+            onChange={this.onChange}
+          />
+        }
         // prevent default behavior
         trigger={[]}
         // @ts-ignore
@@ -133,5 +160,16 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
 
   private onInput(e: ChangeEvent) {
     this.changingValue$.next((e.target as any).value);
+  }
+
+  private onChange(v: T) {
+    const value = this.props.keyProp ? v[this.props.keyProp] : v;
+
+    this.setState({ value: value as any });
+    this.changingValue$.next('');
+
+    if (this.props.onChange) {
+      this.props.onChange(value);
+    }
   }
 }

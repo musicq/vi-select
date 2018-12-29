@@ -7,7 +7,7 @@ interface IVlistProps<T> {
   data$: Observable<T[]>;
   value: any;
   onChange: (v: T) => void;
-  searchField: string;
+  keyProp: any;
 }
 
 export class Vlist<T> extends React.Component<IVlistProps<T>> {
@@ -15,6 +15,10 @@ export class Vlist<T> extends React.Component<IVlistProps<T>> {
     super(props);
 
     this.onSelect = this.onSelect.bind(this);
+  }
+
+  static getActivatedClassName() {
+    return style.VListItemActivated + ' ' + style.VlistItem;
   }
 
   onSelect(e: T) {
@@ -31,9 +35,9 @@ export class Vlist<T> extends React.Component<IVlistProps<T>> {
         >
           {(item: T) => (
             <div
-              className={item[this.props.searchField] === this.props.value
-                ? style.VListItemActivated + ' ' + style.VlistItem
-                : style.VlistItem}
+              className={
+                item[this.props.keyProp] === this.props.value ? Vlist.getActivatedClassName() : style.VlistItem
+              }
               onClick={() => this.onSelect(item)}
             >
               {(this.props.children as any)(item)}
