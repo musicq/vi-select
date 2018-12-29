@@ -13,6 +13,8 @@ interface IVSelectProps<T> {
   dataSource: T[];
   // use to identify which property should be used as value
   keyProp: keyof T;
+  style?: any;
+  className?: string;
 }
 
 interface IVSelectState<T> {
@@ -107,7 +109,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
         hideAction={['blur']}
         onVisibleChange={this.onVisibleChange}
       >
-        <div>
+        <div style={this.props.style} className={this.props.className}>
           <div className="ant-select-selection ant-select-selection--single">
             <div className="ant-select-selection__rendered">
               {/* placeholder */}

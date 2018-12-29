@@ -1,3 +1,4 @@
+import { Button } from 'antd';
 import 'antd/dist/antd.css';
 import React, { Component } from 'react';
 import { VSelect } from 'v-select';
@@ -6,24 +7,30 @@ import data from './data.json';
 export default class App extends Component {
   state = {
     placeholder: '搜索框',
-    value: '屈阁华刚'
+    value: ''
   };
 
   render() {
     return (
-      <div style={{ width: 300, margin: '200px auto' }}>
+      <div style={{ width: 500, margin: '200px auto' }}>
         <div style={{ marginBottom: 20 }}>
-          <button onClick={() => this.setState({ placeholder: 'placeholder: ' + Math.random().toString(36) })}>Change
-            Placeholder
-          </button>
-          <button onClick={() => this.setState({ value: 'value: ' + Math.random().toString(36) })}>Change Value</button>
+          <Button.Group>
+            <Button onClick={() => this.setState({ placeholder: 'placeholder: ' + Math.random().toString(36) })}>
+              Change Placeholder
+            </Button>
+            <Button onClick={() => this.setState({ value: 'value: ' + Math.random().toString(36) })}>
+              Change Value
+            </Button>
+            <Button onClick={() => this.setState({ value: undefined })}>Clear</Button>
+          </Button.Group>
         </div>
 
         <VSelect
           placeholder={this.state.placeholder}
           value={this.state.value}
           dataSource={data}
-          searchField="dealer_product_name"
+          keyProp="dealer_product_name"
+          style={{ width: 300 }}
         >
           {item => (
             <div>
