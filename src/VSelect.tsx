@@ -1,6 +1,6 @@
 import { Dropdown, Icon, Input } from 'antd';
 import * as React from 'react';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, MouseEvent } from 'react';
 import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import style from './styles.css';
@@ -19,6 +19,7 @@ interface IVSelectProps<T> {
   className?: string;
   // for vist, default is 32px
   itemHeight?: number;
+  allowClear?: boolean;
 }
 
 interface IVSelectState<T> {
@@ -58,6 +59,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     this.onInput = this.onInput.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onBlur = this.onBlur.bind(this);
+    this.clearValue = this.clearValue.bind(this);
   }
 
   static getDerivedStateFromProps<T>(props: IVSelectProps<T>, state: IVSelectState<T>) {
@@ -174,9 +176,14 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
               </div>
             </div>
 
+            {this.props.allowClear && (
+              <span className="ant-select-selection__clear" onClick={this.clearValue}>
+                <Icon type="close-circle" theme="filled" className="ant-select-clear-icon"/>
+              </span>
+            )}
             <span className="ant-select-arrow">
               <Icon type="down"/>
-           </span>
+            </span>
           </div>
         </div>
       </Dropdown>
@@ -227,5 +234,16 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     setTimeout(() => {
       this.onVisibleChange(false);
     }, 200); // hack to ensure the select operation work
+  }
+
+  private clearValue(e: MouseEvent) {
+    // stop popup
+    e.stopPropagation();
+
+    this.setState({ value: undefined });
+
+    if (this.props.onChange) {
+      this.props.onChange(undefined);
+    }
   }
 }

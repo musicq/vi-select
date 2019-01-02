@@ -14,6 +14,7 @@ export default class App extends Component {
 
   onChange = e => {
     console.log('You selected', e);
+    this.setState({ value: e });
   };
 
   render() {
@@ -40,6 +41,7 @@ export default class App extends Component {
           onChange={this.onChange}
           itemHeight={90}
           style={{ width: 300 }}
+          allowClear={true}
         >
           {item => (
             <div>
