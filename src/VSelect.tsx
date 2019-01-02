@@ -67,7 +67,9 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     if (props.value !== state.inputValue) {
       state.inputValue = props.value;
       state.realValue = props.value;
-      state.value = VSelect.transValue<T>(props.value, props.dataSource, props.keyProp, props.displayProp);
+      state.value =
+        // if cannot get the value, use the given value
+        VSelect.transValue<T>(props.value, props.dataSource, props.keyProp, props.displayProp) || props.value;
     }
 
     if (props.dataSource !== state.dataSource) {
@@ -207,9 +209,9 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
 
   private onChange(v: T) {
     // use to output
-    const output = this.props.keyProp ? v[this.props.keyProp] : v;
+    const output: any = this.props.keyProp ? v[this.props.keyProp] : v;
     // use to display
-    const value = this.props.displayProp ? v[this.props.displayProp] : v;
+    const value: any = this.props.displayProp ? v[this.props.displayProp] : v;
 
     if (this.props.onChange) {
       this.props.onChange(output);
@@ -217,7 +219,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
 
     this.onVisibleChange(false);
 
-    this.setState({ value: value as any, realValue: output as any });
+    this.setState({ value, realValue: output });
     this.changingValue$.next('');
   }
 
