@@ -9,7 +9,8 @@ const array = new Array(100).fill(0).map((_, i) => i);
 export default class App extends Component {
   state = {
     placeholder: '搜索框',
-    value: '00101742'
+    value: '00101742',
+    disabled: false
   };
 
   onChange = e => {
@@ -29,6 +30,7 @@ export default class App extends Component {
               Change Value
             </Button>
             <Button onClick={() => this.setState({ value: undefined })}>Clear</Button>
+            <Button onClick={() => this.setState({ disabled: !this.state.disabled })}>Toggle Disabled</Button>
           </Button.Group>
         </div>
 
@@ -42,6 +44,7 @@ export default class App extends Component {
           itemHeight={90}
           style={{ width: 300 }}
           allowClear={true}
+          disabled={this.state.disabled}
         >
           {item => (
             <div>
@@ -57,6 +60,7 @@ export default class App extends Component {
           dataSource={array}
           onChange={this.onChange}
           style={{ width: 300, marginTop: 20 }}
+          disabled={this.state.disabled}
         >
           {item => <p>{item}</p>}
         </VSelect>

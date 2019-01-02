@@ -20,6 +20,7 @@ interface IVSelectProps<T> {
   // for vist, default is 32px
   itemHeight?: number;
   allowClear?: boolean;
+  disabled?: boolean;
 }
 
 interface IVSelectState<T> {
@@ -126,8 +127,14 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
 
     const cls = [
       this.props.className,
-      this.state.visible ? 'ant-select ant-select-open ant-select-focused' : ''
+      'ant-select',
+      this.props.disabled ? 'ant-select-disabled' : 'ant-select-enabled',
+      this.props.allowClear ? 'ant-select-allow-clear' : '',
+      this.state.visible ? 'ant-select-open ant-select-focused' : '',
+      this.state.visible ? style.VSelectOpen : ''
     ].join(' ');
+
+    const showAction = this.props.disabled ? [] : ['click'];
 
     return (
       <Dropdown
@@ -144,7 +151,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
         // prevent default behavior
         trigger={[]}
         // @ts-ignore
-        showAction={['click']}
+        showAction={showAction}
         hideAction={[]}
         visible={this.state.visible}
         onVisibleChange={this.onVisibleChange}
@@ -182,7 +189,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
                 <Icon type="close-circle" theme="filled" className="ant-select-clear-icon"/>
               </span>
             )}
-            <span className="ant-select-arrow">
+            <span className={['ant-select-arrow', style.VSelectArrow].join(' ')}>
               <Icon type="down"/>
             </span>
           </div>

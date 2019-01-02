@@ -29,3 +29,11 @@
   outline: 0;
   box-shadow: none;
 }
+
+.VSelectArrow {
+  transition: transform .2s linear;
+}
+
+.VSelectOpen .VSelectArrow {
+  transform: rotateZ(180deg);
+}
