@@ -122,6 +122,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     const isShowPlaceholder = this.state.value !== undefined || this.state.changingValue ? 'none' : 'block';
     const isShowValuePlaceholder = this.state.value !== undefined && !this.state.changingValue ? 'block' : 'none';
     const isShowInput = this.state.isEdit ? 'block' : 'none';
+    const isShowClearBtn = this.props.allowClear && this.state.value;
 
     const cls = [
       this.props.className,
@@ -176,7 +177,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
               </div>
             </div>
 
-            {this.props.allowClear && (
+            {isShowClearBtn && (
               <span className="ant-select-selection__clear" onClick={this.clearValue}>
                 <Icon type="close-circle" theme="filled" className="ant-select-clear-icon"/>
               </span>
