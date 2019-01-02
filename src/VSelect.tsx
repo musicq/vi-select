@@ -57,6 +57,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     this.onVisibleChange = this.onVisibleChange.bind(this);
     this.onInput = this.onInput.bind(this);
     this.onChange = this.onChange.bind(this);
+    this.onBlur = this.onBlur.bind(this);
   }
 
   static getDerivedStateFromProps<T>(props: IVSelectProps<T>, state: IVSelectState<T>) {
@@ -118,6 +119,11 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     const isShowValuePlaceholder = this.state.value !== undefined && !this.state.changingValue ? 'block' : 'none';
     const isShowInput = this.state.isEdit ? 'block' : 'none';
 
+    const cls = [
+      this.props.className,
+      this.state.visible ? 'ant-select ant-select-open ant-select-focused' : ''
+    ].join(' ');
+
     return (
       <Dropdown
         overlay={
@@ -134,10 +140,11 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
         trigger={[]}
         // @ts-ignore
         showAction={['click']}
-        hideAction={['blur']}
+        hideAction={[]}
+        visible={this.state.visible}
         onVisibleChange={this.onVisibleChange}
       >
-        <div style={this.props.style} className={this.props.className}>
+        <div style={this.props.style} className={cls} onBlur={this.onBlur}>
           <div className="ant-select-selection ant-select-selection--single">
             <div className="ant-select-selection__rendered">
               {/* placeholder */}
@@ -175,6 +182,10 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
   }
 
   private onVisibleChange(visible: boolean) {
+    if (visible === this.state.visible) {
+      return;
+    }
+
     if (visible) {
       const ref = this.inputRef.current;
       if (ref) {
@@ -204,7 +215,15 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
       this.props.onChange(output);
     }
 
+    this.onVisibleChange(false);
+
     this.setState({ value: value as any, realValue: output as any });
     this.changingValue$.next('');
+  }
+
+  private onBlur() {
+    setTimeout(() => {
+      this.onVisibleChange(false);
+    }, 200); // hack to ensure the select operation work
   }
 }
