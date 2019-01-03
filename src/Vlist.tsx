@@ -1,6 +1,7 @@
 import * as React from 'react';
-import { Observable, of } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { VirtualList } from 'vist';
+import { IVirtualListOptions } from 'vist/dist';
 import style from './styles.css';
 
 interface IVlistProps<T> {
@@ -9,13 +10,40 @@ interface IVlistProps<T> {
   onChange: (v: T) => void;
   keyProp: any;
   itemHeight?: number;
+  index: number;
 }
 
-export class Vlist<T> extends React.Component<IVlistProps<T>> {
+interface IVlistState {
+  options: IVirtualListOptions;
+  options$: Subject<IVirtualListOptions>;
+}
+
+export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
+  state = {
+    options: { height: this.props.itemHeight || 32, resize: false },
+    options$: new Subject<IVirtualListOptions>()
+  };
+
   constructor(props: any) {
     super(props);
 
     this.onSelect = this.onSelect.bind(this);
+  }
+
+  static getDerivedStateFromProps<T>(props: IVlistProps<T>, state: IVlistState) {
+    const options = state.options;
+
+    if (props.itemHeight !== undefined && props.itemHeight !== options.height) {
+      options.height = props.itemHeight;
+    }
+
+    if (props.index !== options.startIndex) {
+      options.startIndex = props.index;
+    }
+
+    state.options$.next(options);
+
+    return options;
   }
 
   static getActivatedClassName() {
@@ -33,7 +61,7 @@ export class Vlist<T> extends React.Component<IVlistProps<T>> {
       <div className="ant-dropdown-menu">
         <VirtualList
           data$={this.props.data$}
-          options$={of({ height: itemHeight })}
+          options$={this.state.options$}
           style={{ height: 400 }}
         >
           {(item: T) => (

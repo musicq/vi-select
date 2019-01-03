@@ -34,6 +34,7 @@ interface IVSelectState<T> {
   inputValue: string | number | undefined;
   // real value
   realValue: string | number | undefined;
+  index: number;
 }
 
 export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<T>> {
@@ -45,7 +46,8 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     dataSource: undefined,
     dataSource$: new BehaviorSubject<T[]>([]),
     inputValue: undefined,
-    realValue: undefined
+    realValue: undefined,
+    index: 0
   };
 
   private _sub: Subscription[] = [];
@@ -70,9 +72,11 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     if (props.value !== state.inputValue) {
       state.inputValue = props.value;
       state.realValue = props.value;
-      state.value =
-        // if cannot get the value, use the given value
-        VSelect.transValue<T>(props.value, props.dataSource, props.keyProp, props.displayProp) || props.value;
+
+      // if cannot get the value, use the given value
+      const [v, index] = VSelect.transValue<T>(props.value, props.dataSource, props.keyProp, props.displayProp);
+      state.value = v || props.value;
+      state.index = index;
     }
 
     if (props.dataSource !== state.dataSource) {
@@ -89,17 +93,24 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     dataSource: T[],
     keyProp: keyof T,
     displayProp: keyof T
-  ): string | number | undefined {
-    const item = dataSource.find(source => {
+  ): [string | number | undefined, number] {
+    let index = 0;
+    let item = undefined;
+
+    dataSource.forEach((source, i) => {
       const x = keyProp ? source[keyProp] : source;
-      return (x as any) === value;
+      if (x as any === value) {
+        item = source;
+        index = i;
+        return;
+      }
     });
 
     if (item === undefined) {
-      return item;
+      return [item, index];
     }
 
-    return (displayProp ? item[displayProp] : item) as any;
+    return [(displayProp ? (item as T)[displayProp] : item) as any, index];
   }
 
   componentDidMount(): void {
@@ -145,6 +156,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
             keyProp={this.props.keyProp}
             value={this.state.realValue}
             itemHeight={this.props.itemHeight}
+            index={this.state.index}
             onChange={this.onChange}
           />
         }
