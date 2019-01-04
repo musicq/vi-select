@@ -61,6 +61,7 @@ export default class App extends Component {
           onChange={this.onChange}
           style={{ width: 300, marginTop: 20 }}
           disabled={this.state.disabled}
+          value={this.state.value}
         >
           {item => <p>{item}</p>}
         </VSelect>

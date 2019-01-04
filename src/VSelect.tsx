@@ -61,7 +61,6 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     this.onVisibleChange = this.onVisibleChange.bind(this);
     this.onInput = this.onInput.bind(this);
     this.onChange = this.onChange.bind(this);
-    this.onBlur = this.onBlur.bind(this);
     this.clearValue = this.clearValue.bind(this);
   }
 
@@ -164,11 +163,11 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
         trigger={[]}
         // @ts-ignore
         showAction={showAction}
-        hideAction={[]}
+        hideAction={['blur']}
         visible={this.state.visible}
         onVisibleChange={this.onVisibleChange}
       >
-        <div style={this.props.style} className={cls} onBlur={this.onBlur}>
+        <div style={this.props.style} className={cls}>
           <div className="ant-select-selection ant-select-selection--single">
             <div className="ant-select-selection__rendered">
               {/* placeholder */}
@@ -244,16 +243,8 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
       this.props.onChange(output);
     }
 
-    this.onVisibleChange(false);
-
     this.setState({ value, realValue: output });
     this.changingValue$.next('');
-  }
-
-  private onBlur() {
-    setTimeout(() => {
-      this.onVisibleChange(false);
-    }, 200); // hack to ensure the select operation work
   }
 
   private clearValue(e: MouseEvent) {

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { VirtualList } from 'vist';
 import { IVirtualListOptions } from 'vist/dist';
 import style from './styles.css';
@@ -15,13 +15,13 @@ interface IVlistProps<T> {
 
 interface IVlistState {
   options: IVirtualListOptions;
-  options$: Subject<IVirtualListOptions>;
+  options$: BehaviorSubject<IVirtualListOptions>;
 }
 
 export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
   state = {
     options: { height: this.props.itemHeight || 32, resize: false },
-    options$: new Subject<IVirtualListOptions>()
+    options$: new BehaviorSubject<IVirtualListOptions>({ height: this.props.itemHeight || 32 })
   };
 
   constructor(props: any) {
