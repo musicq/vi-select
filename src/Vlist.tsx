@@ -58,7 +58,7 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
     const itemHeight = this.props.itemHeight || 32;
 
     return (
-      <div className="ant-dropdown-menu">
+      <div className="ant-dropdown-menu" onMouseDown={(e: any) => e.preventDefault()}>
         <VirtualList
           data$={this.props.data$}
           options$={this.state.options$}

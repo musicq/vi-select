@@ -243,6 +243,8 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
       this.props.onChange(output);
     }
 
+    setTimeout(() => this.onVisibleChange(false));
+
     this.setState({ value, realValue: output });
     this.changingValue$.next('');
   }
