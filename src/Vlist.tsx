@@ -1,7 +1,7 @@
 import * as React from 'react';
-import { MouseEvent } from 'react';
+import { MouseEvent, ReactNode } from 'react';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { throttleTime } from 'rxjs/operators';
+import { map, throttleTime } from 'rxjs/operators';
 import { IVirtualListOptions, VirtualList } from 'vist';
 import style from './styles.css';
 
@@ -12,17 +12,20 @@ interface IVlistProps<T> {
   keyProp: any;
   itemHeight?: number;
   index: number;
+  emptyTpl?: ReactNode
 }
 
 interface IVlistState {
   options: IVirtualListOptions;
   options$: BehaviorSubject<IVirtualListOptions>;
+  isEmpty: boolean;
 }
 
 export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
   state = {
     options: { height: this.props.itemHeight || 32, resize: false },
-    options$: new BehaviorSubject<IVirtualListOptions>({ height: this.props.itemHeight || 32 })
+    options$: new BehaviorSubject<IVirtualListOptions>({ height: this.props.itemHeight || 32 }),
+    isEmpty: false
   };
 
   private readonly options$: Observable<IVirtualListOptions>;
@@ -58,32 +61,46 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
     return style.VListItemActivated + ' ' + style.VlistItem;
   }
 
+  componentDidMount(): void {
+    this.props.data$.pipe(
+      map(data => !Boolean(data.length))
+    ).subscribe(isEmpty => this.setState({ isEmpty }));
+  }
+
   render() {
     const itemHeight = this.props.itemHeight || 32;
 
     return (
       <div className="ant-dropdown-menu" onMouseDown={this.preventDefault}>
-        <VirtualList
-          data$={this.props.data$}
-          options$={this.options$}
-          style={{ height: 400 }}
-        >
-          {(item: T) => (
-            <div
-              style={{ height: itemHeight }}
-              className={
-                (this.props.keyProp ? item[this.props.keyProp] : item) === this.props.value
-                  ? Vlist.getActivatedClassName()
-                  : style.VlistItem
-              }
-              onClick={() => this.onSelect(item)}
-            >
-              {(this.props.children as any)(item)}
-            </div>
-          )}
-        </VirtualList>
+        {!this.state.isEmpty ? (
+          <VirtualList
+            data$={this.props.data$}
+            options$={this.options$}
+            style={{ maxHeight: 250 }}
+          >
+            {(item: T) => (
+              <div
+                style={{ height: itemHeight }}
+                className={this.getItemClassName(item)}
+                onClick={() => this.onSelect(item)}
+              >
+                {(this.props.children as any)(item)}
+              </div>
+            )}
+          </VirtualList>
+        ) : (
+          <div className={style.VListItemDisabled}>
+            {this.props.emptyTpl ? this.props.emptyTpl : '无匹配项目'}
+          </div>
+        )}
       </div>
     );
+  }
+
+  private getItemClassName<T>(item: T) {
+    return (this.props.keyProp ? item[this.props.keyProp] : item) === this.props.value
+      ? Vlist.getActivatedClassName()
+      : style.VlistItem;
   }
 
   private onSelect(e: T) {

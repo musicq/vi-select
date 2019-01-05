@@ -18,6 +18,13 @@
   background-color: #fafafa;
 }
 
+.VListItemDisabled {
+  padding: 5px 12px;
+  color: rgba(0, 0, 0, 0.25);
+  background: #fff;
+  cursor: not-allowed;
+}
+
 /* Select */
 .VSelectInput {
   padding: 0;

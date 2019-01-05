@@ -1,6 +1,6 @@
 import { Dropdown, Icon, Input } from 'antd';
 import * as React from 'react';
-import { ChangeEvent, MouseEvent } from 'react';
+import { ChangeEvent, MouseEvent, ReactNode } from 'react';
 import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import style from './styles.css';
@@ -21,6 +21,7 @@ export interface IVSelectProps<T> {
   itemHeight?: number;
   allowClear?: boolean;
   disabled?: boolean;
+  emptyTpl?: ReactNode;
 }
 
 interface IVSelectState<T> {
@@ -159,6 +160,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
             value={this.state.realValue}
             itemHeight={this.props.itemHeight}
             index={this.state.index}
+            emptyTpl={this.props.emptyTpl}
             onChange={this.onChange}
           />
         }
