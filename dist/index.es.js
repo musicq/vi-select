@@ -59,8 +59,8 @@ function styleInject(css, ref) {
   }
 }
 
-var css = "/* Vlist style */\n.styles_VlistItem__1kEyz {\n  padding: 5px 12px;\n  cursor: pointer;\n}\n\n.styles_VlistItem__1kEyz:hover {\n  background: #e4e1f0;\n}\n\n.styles_VListItemActivated__3MfXb {\n  background-color: #fafafa;\n  font-weight: 600;\n  color: rgba(0, 0, 0, 0.65);\n}\n\n.styles_VListItemActivated__3MfXb:hover {\n  background-color: #fafafa;\n}\n\n/* Select */\n.styles_VSelectInput__1hLp7 {\n  padding: 0;\n}\n\n.styles_VSelectInput__1hLp7:focus,\n.styles_VSelectInput__1hLp7:hover {\n  border: 0;\n  outline: 0;\n  box-shadow: none;\n}\n\n.styles_VSelectArrow__gwvD8 {\n  transition: transform .2s linear;\n}\n\n.styles_VSelectOpen__2HC4e .styles_VSelectArrow__gwvD8 {\n  transform: rotateZ(180deg);\n}\n";
-var style = {"VlistItem":"styles_VlistItem__1kEyz","VListItemActivated":"styles_VListItemActivated__3MfXb","VSelectInput":"styles_VSelectInput__1hLp7","VSelectArrow":"styles_VSelectArrow__gwvD8","VSelectOpen":"styles_VSelectOpen__2HC4e"};
+var css = "/* Vlist style */\n.styles_VlistItem__1kEyz {\n  padding: 5px 12px;\n  cursor: pointer;\n}\n\n.styles_VlistItem__1kEyz:hover {\n  background: #e4e1f0;\n}\n\n.styles_VListItemActivated__3MfXb {\n  background-color: #fafafa;\n  font-weight: 600;\n  color: rgba(0, 0, 0, 0.65);\n}\n\n.styles_VListItemActivated__3MfXb:hover {\n  background-color: #fafafa;\n}\n\n.styles_VListItemDisabled__3vPYt {\n  padding: 5px 12px;\n  color: rgba(0, 0, 0, 0.25);\n  background: #fff;\n  cursor: not-allowed;\n}\n\n/* Select */\n.styles_VSelectInput__1hLp7 {\n  padding: 0;\n}\n\n.styles_VSelectInput__1hLp7:focus,\n.styles_VSelectInput__1hLp7:hover {\n  border: 0;\n  outline: 0;\n  box-shadow: none;\n}\n\n.styles_VSelectArrow__gwvD8 {\n  transition: transform .2s linear;\n}\n\n.styles_VSelectOpen__2HC4e .styles_VSelectArrow__gwvD8 {\n  transform: rotateZ(180deg);\n}\n";
+var style = {"VlistItem":"styles_VlistItem__1kEyz","VListItemActivated":"styles_VListItemActivated__3MfXb","VListItemDisabled":"styles_VListItemDisabled__3vPYt","VSelectInput":"styles_VSelectInput__1hLp7","VSelectArrow":"styles_VSelectArrow__gwvD8","VSelectOpen":"styles_VSelectOpen__2HC4e"};
 styleInject(css);
 
 /*! *****************************************************************************
@@ -300,7 +300,8 @@ var Vlist = /** @class */ (function (_super) {
         var _this = _super.call(this, props) || this;
         _this.state = {
             options: { height: _this.props.itemHeight || 32, resize: false },
-            options$: new BehaviorSubject({ height: _this.props.itemHeight || 32 })
+            options$: new BehaviorSubject({ height: _this.props.itemHeight || 32 }),
+            isEmpty: false
         };
         _this.onSelect = _this.onSelect.bind(_this);
         _this.preventDefault = _this.preventDefault.bind(_this);
@@ -321,13 +322,19 @@ var Vlist = /** @class */ (function (_super) {
     Vlist.getActivatedClassName = function () {
         return style.VListItemActivated + ' ' + style.VlistItem;
     };
+    Vlist.prototype.componentDidMount = function () {
+        var _this = this;
+        this.props.data$.pipe(map(function (data) { return !Boolean(data.length); })).subscribe(function (isEmpty) { return _this.setState({ isEmpty: isEmpty }); });
+    };
     Vlist.prototype.render = function () {
         var _this = this;
         var itemHeight = this.props.itemHeight || 32;
-        return (createElement("div", { className: "ant-dropdown-menu", onMouseDown: this.preventDefault },
-            createElement(VirtualList, { "data$": this.props.data$, "options$": this.options$, style: { height: 400 } }, function (item) { return (createElement("div", { style: { height: itemHeight }, className: (_this.props.keyProp ? item[_this.props.keyProp] : item) === _this.props.value
-                    ? Vlist.getActivatedClassName()
-                    : style.VlistItem, onClick: function () { return _this.onSelect(item); } }, _this.props.children(item))); })));
+        return (createElement("div", { className: "ant-dropdown-menu", onMouseDown: this.preventDefault }, !this.state.isEmpty ? (createElement(VirtualList, { "data$": this.props.data$, "options$": this.options$, style: { maxHeight: 250 } }, function (item) { return (createElement("div", { style: { height: itemHeight }, className: _this.getItemClassName(item), onClick: function () { return _this.onSelect(item); } }, _this.props.children(item))); })) : (createElement("div", { className: style.VListItemDisabled }, this.props.emptyTpl ? this.props.emptyTpl : '无匹配项目'))));
+    };
+    Vlist.prototype.getItemClassName = function (item) {
+        return (this.props.keyProp ? item[this.props.keyProp] : item) === this.props.value
+            ? Vlist.getActivatedClassName()
+            : style.VlistItem;
     };
     Vlist.prototype.onSelect = function (e) {
         this.props.onChange(e);
@@ -424,7 +431,7 @@ var VSelect = /** @class */ (function (_super) {
             this.state.visible ? style.VSelectOpen : ''
         ].join(' ');
         var showAction = this.props.disabled ? [] : ['click'];
-        return (createElement(Dropdown, { overlay: createElement(Vlist, { "data$": this.data$, children: this.props.children, keyProp: this.props.keyProp, value: this.state.realValue, itemHeight: this.props.itemHeight, index: this.state.index, onChange: this.onChange }), 
+        return (createElement(Dropdown, { overlay: createElement(Vlist, { "data$": this.data$, children: this.props.children, keyProp: this.props.keyProp, value: this.state.realValue, itemHeight: this.props.itemHeight, index: this.state.index, emptyTpl: this.props.emptyTpl, onChange: this.onChange }), 
             // prevent default behavior
             trigger: [], 
             // @ts-ignore

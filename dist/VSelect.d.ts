@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ReactNode } from 'react';
 import { BehaviorSubject } from 'rxjs';
 export interface IVSelectProps<T> {
     placeholder?: string;
@@ -12,6 +13,7 @@ export interface IVSelectProps<T> {
     itemHeight?: number;
     allowClear?: boolean;
     disabled?: boolean;
+    emptyTpl?: ReactNode;
 }
 interface IVSelectState<T> {
     value: string | number | undefined;
