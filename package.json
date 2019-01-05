@@ -1,7 +1,7 @@
 {
   "name": "v-select",
   "version": "1.0.0",
-  "description": "select component using virtual list and compatible with antd",
+  "description": "select component using virtual list - antd special",
   "author": "musicq",
   "license": "MIT",
   "repository": "musicq/v-select",
@@ -22,7 +22,7 @@
     "deploy": "gh-pages -d example/build"
   },
   "dependencies": {
-    "vist": "^0.2.2"
+    "vist": "^0.2.3"
   },
   "peerDependencies": {
     "antd": "^3.11.6",

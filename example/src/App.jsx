@@ -9,7 +9,7 @@ const array = new Array(100).fill(0).map((_, i) => i);
 export default class App extends Component {
   state = {
     placeholder: '搜索框',
-    value: '00101742',
+    value: '02555346',
     disabled: false
   };
 
