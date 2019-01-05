@@ -297,6 +297,7 @@ var VirtualList = /** @class */ (function (_super) {
     };
     return VirtualList;
 }(React.Component));
+//# sourceMappingURL=index.es.js.map
 
 var Vlist = /** @class */ (function (_super) {
     __extends(Vlist, _super);
@@ -490,6 +491,9 @@ var VSelect = /** @class */ (function (_super) {
     };
     return VSelect;
 }(React.Component));
+//# sourceMappingURL=VSelect.js.map
+
+//# sourceMappingURL=index.js.map
 
 exports.VSelect = VSelect;
 //# sourceMappingURL=index.js.map

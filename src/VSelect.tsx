@@ -6,7 +6,7 @@ import { distinctUntilChanged, map } from 'rxjs/operators';
 import style from './styles.css';
 import { Vlist } from './Vlist';
 
-interface IVSelectProps<T> {
+export interface IVSelectProps<T> {
   placeholder?: string;
   value?: string | number | undefined;
   onChange?: Function;

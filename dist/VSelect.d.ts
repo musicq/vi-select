@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { BehaviorSubject } from 'rxjs';
-interface IVSelectProps<T> {
+export interface IVSelectProps<T> {
     placeholder?: string;
     value?: string | number | undefined;
     onChange?: Function;
