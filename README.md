@@ -49,7 +49,7 @@ class App extends React.Component {
 | ------------- | ------------------ | ------------------------------------------------------- |
 | `dataSource`  | `any[]`            | Data source of the select list.                         |
 | `placeholder` | `string`?          | Placeholder of select input.                            |
-| `value`       | `string | number`? | Value of select.                                        |
+| `value`       | `string \| number`? | Value of select.                                        |
 | `onChange`    | `(v?: T) => void`? | Call after select changed.                              |
 | `keyProp`     | `any`?             | Use to identify which property should be used as value. |
 | `displayProp` | `any`?             | Which property should be used to show in the input box. |
