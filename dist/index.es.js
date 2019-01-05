@@ -293,7 +293,6 @@ var VirtualList = /** @class */ (function (_super) {
     };
     return VirtualList;
 }(Component));
-//# sourceMappingURL=index.es.js.map
 
 var Vlist = /** @class */ (function (_super) {
     __extends(Vlist, _super);
@@ -487,9 +486,6 @@ var VSelect = /** @class */ (function (_super) {
     };
     return VSelect;
 }(Component));
-//# sourceMappingURL=VSelect.js.map
-
-//# sourceMappingURL=index.js.map
 
 export { VSelect };
 //# sourceMappingURL=index.es.js.map

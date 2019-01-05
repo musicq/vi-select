@@ -3,10 +3,10 @@ import { BehaviorSubject } from 'rxjs';
 export interface IVSelectProps<T> {
     placeholder?: string;
     value?: string | number | undefined;
-    onChange?: Function;
+    onChange?: (v?: T) => void;
     dataSource: T[];
-    keyProp: keyof T;
-    displayProp: keyof T;
+    keyProp?: keyof T;
+    displayProp?: keyof T;
     style?: any;
     className?: string;
     itemHeight?: number;

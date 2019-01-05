@@ -9,12 +9,12 @@ import { Vlist } from './Vlist';
 export interface IVSelectProps<T> {
   placeholder?: string;
   value?: string | number | undefined;
-  onChange?: Function;
+  onChange?: (v?: T) => void;
   dataSource: T[];
   // use to identify which property should be used as value
-  keyProp: keyof T;
+  keyProp?: keyof T;
   // which field to show in the input box
-  displayProp: keyof T;
+  displayProp?: keyof T;
   style?: any;
   className?: string;
   // for vist, default is 32px
@@ -90,15 +90,15 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
   private static transValue<T>(
     value: string | number | undefined,
     dataSource: T[],
-    keyProp: keyof T,
-    displayProp: keyof T
+    keyProp?: keyof T,
+    displayProp?: keyof T
   ): [string | number | undefined, number] {
     let index = 0;
     let item = undefined;
 
     dataSource.forEach((source, i) => {
       const x = keyProp ? source[keyProp] : source;
-      if (x as any === value) {
+      if ((x as any) === value) {
         item = source;
         index = i;
         return;
