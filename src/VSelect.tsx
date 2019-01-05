@@ -2,7 +2,7 @@ import { Dropdown, Icon, Input } from 'antd';
 import * as React from 'react';
 import { ChangeEvent, MouseEvent } from 'react';
 import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import style from './styles.css';
 import { Vlist } from './Vlist';
 
@@ -117,7 +117,10 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
       this.changingValue$.subscribe(v => this.setState({ changingValue: v }))
     );
 
-    this.data$ = combineLatest(this.state.dataSource$, this.changingValue$).pipe(
+    this.data$ = combineLatest(
+      this.state.dataSource$,
+      this.changingValue$.pipe(distinctUntilChanged())
+    ).pipe(
       map(([dataSource, changingValue]) => changingValue ? dataSource.filter(source => {
         const item = this.props.displayProp ? source[this.props.displayProp] : source;
         return item.toString().toLowerCase().includes(changingValue.toString().toLowerCase());

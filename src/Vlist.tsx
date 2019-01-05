@@ -1,7 +1,8 @@
 import * as React from 'react';
+import { MouseEvent } from 'react';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { VirtualList } from 'vist';
-import { IVirtualListOptions } from 'vist/dist';
+import { throttleTime } from 'rxjs/operators';
+import { IVirtualListOptions, VirtualList } from 'vist';
 import style from './styles.css';
 
 interface IVlistProps<T> {
@@ -24,10 +25,17 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
     options$: new BehaviorSubject<IVirtualListOptions>({ height: this.props.itemHeight || 32 })
   };
 
+  private readonly options$: Observable<IVirtualListOptions>;
+
   constructor(props: any) {
     super(props);
 
     this.onSelect = this.onSelect.bind(this);
+    this.preventDefault = this.preventDefault.bind(this);
+
+    this.options$ = this.state.options$.pipe(
+      throttleTime(10)
+    );
   }
 
   static getDerivedStateFromProps<T>(props: IVlistProps<T>, state: IVlistState) {
@@ -50,18 +58,14 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
     return style.VListItemActivated + ' ' + style.VlistItem;
   }
 
-  onSelect(e: T) {
-    this.props.onChange(e);
-  }
-
   render() {
     const itemHeight = this.props.itemHeight || 32;
 
     return (
-      <div className="ant-dropdown-menu" onMouseDown={(e: any) => e.preventDefault()}>
+      <div className="ant-dropdown-menu" onMouseDown={this.preventDefault}>
         <VirtualList
           data$={this.props.data$}
-          options$={this.state.options$}
+          options$={this.options$}
           style={{ height: 400 }}
         >
           {(item: T) => (
@@ -80,5 +84,13 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
         </VirtualList>
       </div>
     );
+  }
+
+  private onSelect(e: T) {
+    this.props.onChange(e);
+  }
+
+  private preventDefault(e: MouseEvent) {
+    e.preventDefault();
   }
 }

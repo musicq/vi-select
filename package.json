@@ -22,7 +22,7 @@
     "deploy": "gh-pages -d example/build"
   },
   "dependencies": {
-    "vist": "^0.2.1"
+    "vist": "^0.2.2"
   },
   "peerDependencies": {
     "antd": "^3.11.6",
