@@ -42,9 +42,11 @@ export declare class VSelect<T> extends React.Component<IVSelectProps<T>, IVSele
     private inputRef;
     private changingValue$;
     private data$;
+    private refresh$;
     constructor(props: any);
     static getDerivedStateFromProps<T>(props: IVSelectProps<T>, state: IVSelectState<T>): IVSelectState<T>;
-    private static transValue;
+    private static getValueAndIndex;
+    private static updateIndex;
     componentDidMount(): void;
     componentWillUnmount(): void;
     render(): JSX.Element;
@@ -52,5 +54,6 @@ export declare class VSelect<T> extends React.Component<IVSelectProps<T>, IVSele
     private onInput;
     private onChange;
     private clearValue;
+    private onRefresh;
 }
 export {};

@@ -1,6 +1,6 @@
 {
   "name": "v-select",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "select component using virtual list - antd special",
   "author": "musicq",
   "license": "MIT",

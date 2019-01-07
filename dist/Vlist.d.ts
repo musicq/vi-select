@@ -10,6 +10,7 @@ interface IVlistProps<T> {
     itemHeight?: number;
     index: number;
     emptyTpl?: ReactNode;
+    refresh$: Observable<void>;
 }
 interface IVlistState {
     options: IVirtualListOptions;
@@ -26,13 +27,23 @@ export declare class Vlist<T> extends React.Component<IVlistProps<T>, IVlistStat
         isEmpty: boolean;
     };
     private readonly options$;
+    private _sub;
     constructor(props: any);
-    static getDerivedStateFromProps<T>(props: IVlistProps<T>, state: IVlistState): IVirtualListOptions;
+    static getDerivedStateFromProps<T>(props: IVlistProps<T>, state: IVlistState): {
+        options: {
+            height: number;
+            spare?: number | undefined;
+            sticky?: boolean | undefined;
+            startIndex?: number | undefined;
+            resize?: boolean | undefined;
+        };
+    } | null;
     static getActivatedClassName(): string;
+    private static preventDefault;
     componentDidMount(): void;
+    componentWillUnmount(): void;
     render(): JSX.Element;
     private getItemClassName;
     private onSelect;
-    private preventDefault;
 }
 export {};

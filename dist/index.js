@@ -36,6 +36,17 @@ function __extends(d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 }
 
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+
 function styleInject(css, ref) {
   if ( ref === void 0 ) ref = {};
   var insertAt = ref.insertAt;
@@ -178,16 +189,15 @@ var VirtualList = /** @class */ (function (_super) {
         var scrollEvent$ = rxjs.fromEvent(virtualListElm, 'scroll').pipe(operators.startWith({ target: { scrollTop: this.lastScrollPos } }));
         // scroll top
         var scrollTop$ = scrollEvent$.pipe(operators.map(function (e) { return e.target.scrollTop; }));
-        // if data array is filled
-        var hasData$ = this.props.data$.pipe(operators.filter(function (data) { return Boolean(data.length); }));
-        // buffer until the data is arrived, then every emit will trigger emit
-        var bufferStream$ = rxjs.combineLatest(hasData$, 
-        // delay 1ms to ensure buffer trigger after options$
-        this.options$.pipe(operators.delay(1)));
         // scroll to the given position
-        this._subs.push(this.options$.pipe(operators.buffer(bufferStream$), operators.filter(function (options) { return Boolean(options.length); }), operators.map(function (options) { return options[options.length - 1]; }), operators.filter(function (option) { return option.startIndex !== undefined; }), operators.map(function (option) { return option.startIndex * option.height; })
+        this._subs.push(this.options$.pipe(operators.filter(function (option) { return option.startIndex !== undefined; }), operators.map(function (option) { return option.startIndex * option.height; })
         // setTimeout to make sure the list is already rendered
         ).subscribe(function (scrollTop) { return setTimeout(function () { return virtualListElm.scrollTo(0, scrollTop); }); }));
+        // let the scroll bar stick the top
+        this._subs.push(this.props.data$.pipe(operators.withLatestFrom(this.options$), operators.filter(function (_a) {
+            var _ = _a[0], options = _a[1];
+            return Boolean(options.sticky);
+        })).subscribe(function () { return setTimeout(function () { return virtualListElm.scrollTo(0, 0); }); }));
         // scroll direction Down/Up
         var scrollDirection$ = scrollTop$.pipe(operators.map(function (scrollTop) {
             var dir = scrollTop - _this.lastScrollPos;
@@ -199,11 +209,6 @@ var VirtualList = /** @class */ (function (_super) {
             var ch = _a[0], option = _a[1];
             return Math.ceil(ch / option.height) + (option.spare || 3);
         }));
-        // let the scroll bar stick the top
-        this._subs.push(this.props.data$.pipe(operators.withLatestFrom(this.options$), operators.filter(function (_a) {
-            var _ = _a[0], options = _a[1];
-            return Boolean(options.sticky);
-        })).subscribe(function () { return setTimeout(function () { return virtualListElm.scrollTo(0, 0); }); }));
         // data indexes in view
         var indexes$ = rxjs.combineLatest(scrollTop$, this.options$).pipe(
         // the index of the top elements of the current list
@@ -307,33 +312,48 @@ var Vlist = /** @class */ (function (_super) {
             options$: new rxjs.BehaviorSubject({ height: _this.props.itemHeight || 32 }),
             isEmpty: false
         };
+        _this._sub = [];
         _this.onSelect = _this.onSelect.bind(_this);
-        _this.preventDefault = _this.preventDefault.bind(_this);
+        // to prevent many options at one time
         _this.options$ = _this.state.options$.pipe(operators.throttleTime(10));
         return _this;
     }
     Vlist.getDerivedStateFromProps = function (props, state) {
-        var options = state.options;
+        var options = __assign({}, state.options);
+        var changed = false;
         if (props.itemHeight !== undefined && props.itemHeight !== options.height) {
             options.height = props.itemHeight;
+            changed = true;
         }
         if (props.index !== options.startIndex) {
             options.startIndex = props.index;
+            changed = true;
         }
-        state.options$.next(options);
-        return options;
+        if (changed) {
+            state.options$.next(options);
+        }
+        return changed ? { options: options } : null;
     };
     Vlist.getActivatedClassName = function () {
         return style.VListItemActivated + ' ' + style.VlistItem;
     };
+    Vlist.preventDefault = function (e) {
+        e.preventDefault();
+    };
     Vlist.prototype.componentDidMount = function () {
         var _this = this;
-        this.props.data$.pipe(operators.map(function (data) { return !Boolean(data.length); })).subscribe(function (isEmpty) { return _this.setState({ isEmpty: isEmpty }); });
+        this._sub.push(this.props.data$.pipe(operators.map(function (data) { return !Boolean(data.length); })).subscribe(function (isEmpty) { return _this.setState({ isEmpty: isEmpty }); }));
+        this._sub.push(this.props.refresh$
+            .pipe(operators.delay(1))
+            .subscribe(function () { return _this.state.options$.next(_this.state.options); }));
+    };
+    Vlist.prototype.componentWillUnmount = function () {
+        this._sub.forEach(function (s) { return s.unsubscribe(); });
     };
     Vlist.prototype.render = function () {
         var _this = this;
         var itemHeight = this.props.itemHeight || 32;
-        return (React.createElement("div", { className: "ant-dropdown-menu", onMouseDown: this.preventDefault }, !this.state.isEmpty ? (React.createElement(VirtualList, { "data$": this.props.data$, "options$": this.options$, style: { maxHeight: 250 } }, function (item) { return (React.createElement("div", { style: { height: itemHeight }, className: _this.getItemClassName(item), onClick: function () { return _this.onSelect(item); } }, _this.props.children(item))); })) : (React.createElement("div", { className: style.VListItemDisabled }, this.props.emptyTpl ? this.props.emptyTpl : '无匹配项目'))));
+        return (React.createElement("div", { className: "ant-dropdown-menu", onMouseDown: Vlist.preventDefault }, !this.state.isEmpty ? (React.createElement(VirtualList, { "data$": this.props.data$, "options$": this.options$, style: { maxHeight: 250 } }, function (item) { return (React.createElement("div", { style: { height: itemHeight }, className: _this.getItemClassName(item), onClick: function () { return _this.onSelect(item); } }, _this.props.children(item))); })) : (React.createElement("div", { className: style.VListItemDisabled }, this.props.emptyTpl ? this.props.emptyTpl : '无匹配项目'))));
     };
     Vlist.prototype.getItemClassName = function (item) {
         return (this.props.keyProp ? item[this.props.keyProp] : item) === this.props.value
@@ -342,9 +362,6 @@ var Vlist = /** @class */ (function (_super) {
     };
     Vlist.prototype.onSelect = function (e) {
         this.props.onChange(e);
-    };
-    Vlist.prototype.preventDefault = function (e) {
-        e.preventDefault();
     };
     return Vlist;
 }(React.Component));
@@ -367,45 +384,47 @@ var VSelect = /** @class */ (function (_super) {
         _this._sub = [];
         _this.inputRef = React.createRef();
         _this.changingValue$ = new rxjs.BehaviorSubject('');
+        _this.refresh$ = new rxjs.Subject();
         _this.onVisibleChange = _this.onVisibleChange.bind(_this);
         _this.onInput = _this.onInput.bind(_this);
         _this.onChange = _this.onChange.bind(_this);
         _this.clearValue = _this.clearValue.bind(_this);
+        _this.onRefresh = _this.onRefresh.bind(_this);
         return _this;
     }
     VSelect.getDerivedStateFromProps = function (props, state) {
-        var newState = {};
         // if props value has change, then change the state value
         if (props.value !== state.inputValue) {
             state.inputValue = props.value;
             state.realValue = props.value;
-            // if cannot get the value, use the given value
-            var _a = VSelect.transValue(props.value, props.dataSource, props.keyProp, props.displayProp), v = _a[0], index = _a[1];
-            state.value = v || props.value;
-            state.index = index;
+            Object.assign(state, VSelect.updateIndex(props));
         }
         if (props.dataSource !== state.dataSource) {
-            newState.dataSource = props.dataSource;
+            state.dataSource = props.dataSource;
             state.dataSource$.next(props.dataSource);
+            Object.assign(state, VSelect.updateIndex(props));
         }
-        return newState;
+        return state;
     };
-    // transform value
-    VSelect.transValue = function (value, dataSource, keyProp, displayProp) {
-        var index = 0;
-        var item = undefined;
-        dataSource.forEach(function (source, i) {
+    // get value and index
+    VSelect.getValueAndIndex = function (value, dataSource, keyProp, displayProp) {
+        var index = dataSource.findIndex(function (source) {
             var x = keyProp ? source[keyProp] : source;
-            if (x === value) {
-                item = source;
-                index = i;
-                return;
-            }
+            return x === value;
         });
-        if (item === undefined) {
-            return [item, index];
+        if (index === -1) {
+            return [undefined, 0];
         }
+        var item = dataSource[index];
         return [(displayProp ? item[displayProp] : item), index];
+    };
+    VSelect.updateIndex = function (props) {
+        // if cannot get the value, use the given value
+        var _a = VSelect.getValueAndIndex(props.value, props.dataSource, props.keyProp, props.displayProp), v = _a[0], index = _a[1];
+        return {
+            value: v || props.value,
+            index: index
+        };
     };
     VSelect.prototype.componentDidMount = function () {
         var _this = this;
@@ -435,12 +454,12 @@ var VSelect = /** @class */ (function (_super) {
             this.state.visible ? style.VSelectOpen : ''
         ].join(' ');
         var showAction = this.props.disabled ? [] : ['click'];
-        return (React.createElement(antd.Dropdown, { overlay: React.createElement(Vlist, { "data$": this.data$, children: this.props.children, keyProp: this.props.keyProp, value: this.state.realValue, itemHeight: this.props.itemHeight, index: this.state.index, emptyTpl: this.props.emptyTpl, onChange: this.onChange }), 
+        return (React.createElement(antd.Dropdown, { overlay: React.createElement(Vlist, { "data$": this.data$, children: this.props.children, keyProp: this.props.keyProp, value: this.state.realValue, itemHeight: this.props.itemHeight, index: this.state.index, emptyTpl: this.props.emptyTpl, onChange: this.onChange, "refresh$": this.refresh$ }), 
             // prevent default behavior
             trigger: [], 
             // @ts-ignore
             showAction: showAction, hideAction: ['blur'], visible: this.state.visible, onVisibleChange: this.onVisibleChange },
-            React.createElement("div", { style: this.props.style, className: cls },
+            React.createElement("div", { style: this.props.style, className: cls, onClick: this.onRefresh, onBlur: this.onRefresh },
                 React.createElement("div", { className: "ant-select-selection ant-select-selection--single" },
                     React.createElement("div", { className: "ant-select-selection__rendered" },
                         React.createElement("div", { className: "ant-select-selection__placeholder", style: { display: isShowPlaceholder } }, this.props.placeholder),
@@ -494,6 +513,11 @@ var VSelect = /** @class */ (function (_super) {
         if (this.props.onChange) {
             this.props.onChange(undefined);
         }
+    };
+    VSelect.prototype.onRefresh = function () {
+        var _this = this;
+        // emit next tick, because vlist may not mount yet.
+        setTimeout(function () { return _this.refresh$.next(); });
     };
     return VSelect;
 }(React.Component));
