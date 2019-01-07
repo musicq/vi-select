@@ -1,7 +1,7 @@
 import { Dropdown, Icon, Input } from 'antd';
 import * as React from 'react';
 import { ChangeEvent, MouseEvent, ReactNode } from 'react';
-import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subject, Subscription } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import style from './styles.css';
 import { Vlist } from './Vlist';
@@ -55,6 +55,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
   private inputRef = React.createRef<Input>();
   private changingValue$ = new BehaviorSubject<string>('');
   private data$: Observable<T[]>;
+  private refresh$ = new Subject<void>();
 
   constructor(props: any) {
     super(props);
@@ -63,54 +64,55 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     this.onInput = this.onInput.bind(this);
     this.onChange = this.onChange.bind(this);
     this.clearValue = this.clearValue.bind(this);
+    this.onRefresh = this.onRefresh.bind(this);
   }
 
   static getDerivedStateFromProps<T>(props: IVSelectProps<T>, state: IVSelectState<T>) {
-    const newState = {} as IVSelectState<T>;
-
     // if props value has change, then change the state value
     if (props.value !== state.inputValue) {
       state.inputValue = props.value;
       state.realValue = props.value;
-
-      // if cannot get the value, use the given value
-      const [v, index] = VSelect.transValue<T>(props.value, props.dataSource, props.keyProp, props.displayProp);
-      state.value = v || props.value;
-      state.index = index;
+      Object.assign(state, VSelect.updateIndex(props));
     }
 
     if (props.dataSource !== state.dataSource) {
-      newState.dataSource = props.dataSource;
+      state.dataSource = props.dataSource;
       state.dataSource$.next(props.dataSource);
+      Object.assign(state, VSelect.updateIndex(props));
     }
 
-    return newState;
+    return state;
   }
 
-  // transform value
-  private static transValue<T>(
+  // get value and index
+  private static getValueAndIndex<T>(
     value: string | number | undefined,
     dataSource: T[],
     keyProp?: keyof T,
     displayProp?: keyof T
   ): [string | number | undefined, number] {
-    let index = 0;
-    let item = undefined;
-
-    dataSource.forEach((source, i) => {
+    const index = dataSource.findIndex(source => {
       const x = keyProp ? source[keyProp] : source;
-      if ((x as any) === value) {
-        item = source;
-        index = i;
-        return;
-      }
+      return x as any === value;
     });
 
-    if (item === undefined) {
-      return [item, index];
+    if (index === -1) {
+      return [undefined, 0];
     }
 
+    const item = dataSource[index];
+
     return [(displayProp ? (item as T)[displayProp] : item) as any, index];
+  }
+
+  private static updateIndex<T>(props: IVSelectProps<T>) {
+    // if cannot get the value, use the given value
+    const [v, index] = VSelect.getValueAndIndex<T>(props.value, props.dataSource, props.keyProp, props.displayProp);
+
+    return {
+      value: v || props.value,
+      index
+    };
   }
 
   componentDidMount(): void {
@@ -162,6 +164,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
             index={this.state.index}
             emptyTpl={this.props.emptyTpl}
             onChange={this.onChange}
+            refresh$={this.refresh$}
           />
         }
         // prevent default behavior
@@ -172,7 +175,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
         visible={this.state.visible}
         onVisibleChange={this.onVisibleChange}
       >
-        <div style={this.props.style} className={cls}>
+        <div style={this.props.style} className={cls} onClick={this.onRefresh} onBlur={this.onRefresh}>
           <div className="ant-select-selection ant-select-selection--single">
             <div className="ant-select-selection__rendered">
               {/* placeholder */}
@@ -263,5 +266,10 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     if (this.props.onChange) {
       this.props.onChange(undefined);
     }
+  }
+
+  private onRefresh() {
+    // emit next tick, because vlist may not mount yet.
+    setTimeout(() => this.refresh$.next());
   }
 }

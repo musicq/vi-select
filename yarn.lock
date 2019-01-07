@@ -10810,10 +10810,10 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vist@^0.2.3:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/vist/-/vist-0.2.3.tgz#021f80e515f8f940fa6ae213771e80a61628a22b"
-  integrity sha512-Nv2W38WrUejmTLSU8vQlN26rnCgC8q6iw6zCU1y0hAa9nWdQReohOyYUCLLfJ5sPAxTQlnvvMEdSJ37U7uIKHA==
+vist@^0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/vist/-/vist-0.2.4.tgz#42c0858d21161a565c4d5f41018234838ba5dc1f"
+  integrity sha512-qWkXKRKEk2JdaeAV2B4wwoqHitR8xM1Qc/gx3JW1PqzqCPO9fqRY055XTepmVhiA8u6Kx0SXDreykk0LS147TA==
 
 vm-browserify@0.0.4:
   version "0.0.4"

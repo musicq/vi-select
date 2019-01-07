@@ -2,21 +2,28 @@ import { Button } from 'antd';
 import 'antd/dist/antd.css';
 import React, { Component } from 'react';
 import { VSelect } from 'v-select';
-import data from './data.json';
 
 const array = new Array(100).fill(0).map((_, i) => i);
 
 export default class App extends Component {
   state = {
     placeholder: '搜索框',
-    value: '02555346',
-    disabled: false
+    value: 36,
+    disabled: false,
+    data: []
   };
 
   onChange = e => {
     console.log('You selected', e);
     this.setState({ value: e });
   };
+
+  componentDidMount() {
+    fetch('https://jsonplaceholder.typicode.com/comments')
+      .then(res => res.json())
+      .then(data => this.setState({ data }))
+      .catch(e => console.error(e));
+  }
 
   render() {
     return (
@@ -37,21 +44,19 @@ export default class App extends Component {
         <VSelect
           placeholder={this.state.placeholder}
           value={this.state.value}
-          dataSource={data}
-          keyProp="dealer_id"
-          displayProp="dealer_product_name"
+          dataSource={this.state.data}
+          keyProp="id"
+          displayProp="email"
           onChange={this.onChange}
-          itemHeight={90}
+          itemHeight={60}
           style={{ width: 300 }}
           allowClear={true}
           disabled={this.state.disabled}
         >
           {item => (
-            <div>
-              <div>{item.created_type}</div>
-              <div>{item.dealer_id}</div>
-              <div>{item.dealer_product_name}</div>
-              <div>{item.signed}</div>
+            <div style={{ whiteSpace: 'nowrap' }}>
+              <div style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{item.id} - {item.email}</div>
+              <div style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{item.name}</div>
             </div>
           )}
         </VSelect>

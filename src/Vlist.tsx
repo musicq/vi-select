@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { MouseEvent, ReactNode } from 'react';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map, throttleTime } from 'rxjs/operators';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { delay, map, throttleTime } from 'rxjs/operators';
 import { IVirtualListOptions, VirtualList } from 'vist';
 import style from './styles.css';
 
@@ -12,7 +12,9 @@ interface IVlistProps<T> {
   keyProp: any;
   itemHeight?: number;
   index: number;
-  emptyTpl?: ReactNode
+  emptyTpl?: ReactNode;
+  // use to tell virtual list to refresh options
+  refresh$: Observable<void>;
 }
 
 interface IVlistState {
@@ -29,49 +31,69 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
   };
 
   private readonly options$: Observable<IVirtualListOptions>;
+  private _sub: Subscription[] = [];
 
   constructor(props: any) {
     super(props);
 
     this.onSelect = this.onSelect.bind(this);
-    this.preventDefault = this.preventDefault.bind(this);
 
-    this.options$ = this.state.options$.pipe(
-      throttleTime(10)
-    );
+    // to prevent many options at one time
+    this.options$ = this.state.options$.pipe(throttleTime(10));
   }
 
   static getDerivedStateFromProps<T>(props: IVlistProps<T>, state: IVlistState) {
-    const options = state.options;
+    const options = { ...state.options };
+    let changed = false;
 
     if (props.itemHeight !== undefined && props.itemHeight !== options.height) {
       options.height = props.itemHeight;
+      changed = true;
     }
 
     if (props.index !== options.startIndex) {
       options.startIndex = props.index;
+      changed = true;
     }
 
-    state.options$.next(options);
+    if (changed) {
+      state.options$.next(options);
+    }
 
-    return options;
+    return changed ? { options } : null;
   }
 
   static getActivatedClassName() {
     return style.VListItemActivated + ' ' + style.VlistItem;
   }
 
+  private static preventDefault(e: MouseEvent) {
+    e.preventDefault();
+  }
+
   componentDidMount(): void {
-    this.props.data$.pipe(
-      map(data => !Boolean(data.length))
-    ).subscribe(isEmpty => this.setState({ isEmpty }));
+    this._sub.push(
+      this.props.data$.pipe(
+        map(data => !Boolean(data.length))
+      ).subscribe(isEmpty => this.setState({ isEmpty }))
+    );
+
+    this._sub.push(
+      this.props.refresh$
+        .pipe(delay(1))
+        .subscribe(() => this.state.options$.next(this.state.options))
+    );
+  }
+
+  componentWillUnmount(): void {
+    this._sub.forEach(s => s.unsubscribe());
   }
 
   render() {
     const itemHeight = this.props.itemHeight || 32;
 
     return (
-      <div className="ant-dropdown-menu" onMouseDown={this.preventDefault}>
+      <div className="ant-dropdown-menu" onMouseDown={Vlist.preventDefault}>
         {!this.state.isEmpty ? (
           <VirtualList
             data$={this.props.data$}
@@ -105,9 +127,5 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
 
   private onSelect(e: T) {
     this.props.onChange(e);
-  }
-
-  private preventDefault(e: MouseEvent) {
-    e.preventDefault();
   }
 }

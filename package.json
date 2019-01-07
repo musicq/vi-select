@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "rxjs": "^6.3.3",
-    "vist": "^0.2.3"
+    "vist": "^0.2.4"
   },
   "peerDependencies": {
     "antd": "^3.11.6",
