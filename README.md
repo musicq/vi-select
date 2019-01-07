@@ -60,6 +60,27 @@ class App extends React.Component {
 | `disabled`    | `boolean`?          | Disabled select.                                        |
 | `emptyTpl`    | `ReactNode`?        | Empty template when not data.                           |
 
+
+## Development
+
+#### install dependencies
+
+```bash
+cd v-select && yarn
+```
+
+#### build code
+
+```bash
+yarn build
+```
+
+#### see the examples
+
+```bash
+cd v-select/example && yarn start
+```
+
 ## License
 
 MIT © [musicq](https://github.com/musicq)
