@@ -1,6 +1,6 @@
 {
-  "name": "v-select-example",
-  "homepage": "https://musicq.github.io/v-select",
+  "name": "vi-select-example",
+  "homepage": "https://musicq.github.io/vi-select",
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
@@ -11,7 +11,7 @@
     "react-dom": "^16.4.1",
     "react-scripts": "^1.1.4",
     "rxjs": "^6.3.3",
-    "v-select": "link:.."
+    "vi-select": "link:.."
   },
   "scripts": {
     "start": "react-scripts start",

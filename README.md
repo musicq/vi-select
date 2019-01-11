@@ -1,20 +1,20 @@
-# v-select
+# vi-select
 
 > select component using virtual list - antd special
 
-[![NPM](https://img.shields.io/npm/v/v-select.svg)](https://www.npmjs.com/package/v-select)
+[![NPM](https://img.shields.io/npm/v/vi-select.svg)](https://www.npmjs.com/package/vi-select)
 
 ## Install
 
 ```bash
-npm install --save v-select
+npm install --save vi-select
 ```
 
 ## Usage
 
 ```javascript
 import React from "react";
-import { VSelect } from "v-select";
+import { VSelect } from "vi-select";
 
 const array = new Array(100).fill(0).map((_, i) => i);
 
@@ -66,7 +66,7 @@ class App extends React.Component {
 #### install dependencies
 
 ```bash
-cd v-select && yarn
+cd vi-select && yarn
 ```
 
 #### build code
@@ -78,7 +78,7 @@ yarn build
 #### see the examples
 
 ```bash
-cd v-select/example && yarn start
+cd vi-select/example && yarn start
 ```
 
 ## License

@@ -1,10 +1,10 @@
 {
-  "name": "v-select",
+  "name": "vi-select",
   "version": "0.1.2",
   "description": "select component using virtual list - antd special",
   "author": "musicq",
   "license": "MIT",
-  "repository": "musicq/v-select",
+  "repository": "musicq/vi-select",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",
