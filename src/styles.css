@@ -2,6 +2,9 @@
 .VlistItem {
   padding: 5px 12px;
   cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .VlistItem:hover {

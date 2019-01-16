@@ -63,10 +63,6 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
     return changed ? { options } : null;
   }
 
-  static getActivatedClassName() {
-    return style.VListItemActivated + ' ' + style.VlistItem;
-  }
-
   private static preventDefault(e: MouseEvent) {
     e.preventDefault();
   }
@@ -120,9 +116,10 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
   }
 
   private getItemClassName<T>(item: T) {
-    return (this.props.keyProp ? item[this.props.keyProp] : item) === this.props.value
-      ? Vlist.getActivatedClassName()
-      : style.VlistItem;
+    const clsName =
+      (this.props.keyProp ? item[this.props.keyProp] : item) === this.props.value ? style.VListItemActivated : '';
+
+    return [clsName, style.VlistItem].join(' ');
   }
 
   private onSelect(e: T) {
