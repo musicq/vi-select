@@ -74,7 +74,7 @@ function styleInject(css, ref) {
   }
 }
 
-var css = "/* Vlist style */\n.styles_VlistItem__1kEyz {\n  padding: 5px 12px;\n  cursor: pointer;\n}\n\n.styles_VlistItem__1kEyz:hover {\n  background: #e4e1f0;\n}\n\n.styles_VListItemActivated__3MfXb {\n  background-color: #fafafa;\n  font-weight: 600;\n  color: rgba(0, 0, 0, 0.65);\n}\n\n.styles_VListItemActivated__3MfXb:hover {\n  background-color: #fafafa;\n}\n\n.styles_VListItemDisabled__3vPYt {\n  padding: 5px 12px;\n  color: rgba(0, 0, 0, 0.25);\n  background: #fff;\n  cursor: not-allowed;\n}\n\n/* Select */\n.styles_VSelectInput__1hLp7 {\n  padding: 0;\n}\n\n.styles_VSelectInput__1hLp7:focus,\n.styles_VSelectInput__1hLp7:hover {\n  border: 0;\n  outline: 0;\n  box-shadow: none;\n}\n\n.styles_VSelectArrow__gwvD8 {\n  transition: transform .2s linear;\n}\n\n.styles_VSelectOpen__2HC4e .styles_VSelectArrow__gwvD8 {\n  transform: rotateZ(180deg);\n}\n";
+var css = "/* Vlist style */\n.styles_VlistItem__1kEyz {\n  padding: 5px 12px;\n  cursor: pointer;\n  white-space: nowrap;\n  text-overflow: ellipsis;\n  overflow: hidden;\n}\n\n.styles_VlistItem__1kEyz:hover {\n  background: #e4e1f0;\n}\n\n.styles_VListItemActivated__3MfXb {\n  background-color: #fafafa;\n  font-weight: 600;\n  color: rgba(0, 0, 0, 0.65);\n}\n\n.styles_VListItemActivated__3MfXb:hover {\n  background-color: #fafafa;\n}\n\n.styles_VListItemDisabled__3vPYt {\n  padding: 5px 12px;\n  color: rgba(0, 0, 0, 0.25);\n  background: #fff;\n  cursor: not-allowed;\n}\n\n/* Select */\n.styles_VSelectInput__1hLp7 {\n  padding: 0;\n}\n\n.styles_VSelectInput__1hLp7:focus,\n.styles_VSelectInput__1hLp7:hover {\n  border: 0;\n  outline: 0;\n  box-shadow: none;\n}\n\n.styles_VSelectArrow__gwvD8 {\n  transition: transform .2s linear;\n}\n\n.styles_VSelectOpen__2HC4e .styles_VSelectArrow__gwvD8 {\n  transform: rotateZ(180deg);\n}\n";
 var style = {"VlistItem":"styles_VlistItem__1kEyz","VListItemActivated":"styles_VListItemActivated__3MfXb","VListItemDisabled":"styles_VListItemDisabled__3vPYt","VSelectInput":"styles_VSelectInput__1hLp7","VSelectArrow":"styles_VSelectArrow__gwvD8","VSelectOpen":"styles_VSelectOpen__2HC4e"};
 styleInject(css);
 
@@ -334,9 +334,6 @@ var Vlist = /** @class */ (function (_super) {
         }
         return changed ? { options: options } : null;
     };
-    Vlist.getActivatedClassName = function () {
-        return style.VListItemActivated + ' ' + style.VlistItem;
-    };
     Vlist.preventDefault = function (e) {
         e.preventDefault();
     };
@@ -356,9 +353,8 @@ var Vlist = /** @class */ (function (_super) {
         return (React.createElement("div", { className: "ant-dropdown-menu", onMouseDown: Vlist.preventDefault }, !this.state.isEmpty ? (React.createElement(VirtualList, { "data$": this.props.data$, "options$": this.options$, style: { maxHeight: 250 } }, function (item) { return (React.createElement("div", { style: { height: itemHeight }, className: _this.getItemClassName(item), onClick: function () { return _this.onSelect(item); } }, _this.props.children(item))); })) : (React.createElement("div", { className: style.VListItemDisabled }, this.props.emptyTpl ? this.props.emptyTpl : '无匹配项目'))));
     };
     Vlist.prototype.getItemClassName = function (item) {
-        return (this.props.keyProp ? item[this.props.keyProp] : item) === this.props.value
-            ? Vlist.getActivatedClassName()
-            : style.VlistItem;
+        var clsName = (this.props.keyProp ? item[this.props.keyProp] : item) === this.props.value ? style.VListItemActivated : '';
+        return [clsName, style.VlistItem].join(' ');
     };
     Vlist.prototype.onSelect = function (e) {
         this.props.onChange(e);

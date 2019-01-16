@@ -38,7 +38,6 @@ export declare class Vlist<T> extends React.Component<IVlistProps<T>, IVlistStat
             resize?: boolean | undefined;
         };
     } | null;
-    static getActivatedClassName(): string;
     private static preventDefault;
     componentDidMount(): void;
     componentWillUnmount(): void;
