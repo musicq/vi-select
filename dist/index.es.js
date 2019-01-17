@@ -491,12 +491,13 @@ var VSelect = /** @class */ (function (_super) {
         var output = this.props.keyProp ? v[this.props.keyProp] : v;
         // use to display
         var value = this.props.displayProp ? v[this.props.displayProp] : v;
-        if (this.props.onChange) {
+        // only emit when value is changed
+        if (output !== this.state.realValue && this.props.onChange) {
             this.props.onChange(output);
+            this.setState({ value: value, realValue: output });
+            this.changingValue$.next("");
         }
         setTimeout(function () { return _this.onVisibleChange(false); });
-        this.setState({ value: value, realValue: output });
-        this.changingValue$.next('');
     };
     VSelect.prototype.clearValue = function (e) {
         // stop popup
