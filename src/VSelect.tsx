@@ -247,14 +247,15 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     // use to display
     const value: any = this.props.displayProp ? v[this.props.displayProp] : v;
 
-    if (this.props.onChange) {
+    // only emit when value is changed
+    if (output !== this.state.realValue && this.props.onChange) {
       this.props.onChange(output);
+
+      this.setState({ value, realValue: output });
+      this.changingValue$.next("");
     }
 
     setTimeout(() => this.onVisibleChange(false));
-
-    this.setState({ value, realValue: output });
-    this.changingValue$.next('');
   }
 
   private clearValue(e: MouseEvent) {
