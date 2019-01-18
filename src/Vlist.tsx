@@ -25,7 +25,7 @@ interface IVlistState {
 
 export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
   state = {
-    options: { height: this.props.itemHeight || 32, resize: false },
+    options: { height: this.props.itemHeight || 32, resize: false, spare: 10 },
     options$: new BehaviorSubject<IVirtualListOptions>({ height: this.props.itemHeight || 32 }),
     isEmpty: false
   };
