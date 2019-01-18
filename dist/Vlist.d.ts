@@ -22,6 +22,7 @@ export declare class Vlist<T> extends React.Component<IVlistProps<T>, IVlistStat
         options: {
             height: number;
             resize: boolean;
+            spare: number;
         };
         options$: BehaviorSubject<IVirtualListOptions>;
         isEmpty: boolean;

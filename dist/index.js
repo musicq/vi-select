@@ -308,7 +308,7 @@ var Vlist = /** @class */ (function (_super) {
     function Vlist(props) {
         var _this = _super.call(this, props) || this;
         _this.state = {
-            options: { height: _this.props.itemHeight || 32, resize: false },
+            options: { height: _this.props.itemHeight || 32, resize: false, spare: 10 },
             options$: new rxjs.BehaviorSubject({ height: _this.props.itemHeight || 32 }),
             isEmpty: false
         };
