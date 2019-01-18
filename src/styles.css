@@ -36,8 +36,8 @@
 .VSelectInput:focus,
 .VSelectInput:hover {
   border: 0;
-  outline: 0;
-  box-shadow: none;
+  outline: 0 !important;
+  box-shadow: none !important;
 }
 
 .VSelectArrow {
