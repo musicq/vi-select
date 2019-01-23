@@ -1,3 +1,13 @@
+## [0.1.4](https://github.com/musicq/vi-select/compare/v0.1.3...v0.1.4) (2019-01-23)
+
+
+### Bug Fixes
+
+* default render 10 spare items ([b552791](https://github.com/musicq/vi-select/commit/b552791))
+* onChange only called when value is change ([775a485](https://github.com/musicq/vi-select/commit/775a485))
+
+
+
 ## [0.1.3](https://github.com/musicq/vi-select/compare/v0.1.2...v0.1.3) (2019-01-16)
 
 
