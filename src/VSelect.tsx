@@ -223,10 +223,13 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     }
 
     if (visible) {
-      const ref = this.inputRef.current;
-      if (ref) {
-        setTimeout(() => ref.focus());
-      }
+      setTimeout(() => {
+        const ref = this.inputRef.current;
+
+        if (ref) {
+          ref.focus();
+        }
+      });
       this.setState({ isEdit: true });
     } else {
       // clear temp value

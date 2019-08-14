@@ -474,14 +474,17 @@ var VSelect = /** @class */ (function (_super) {
                         React.createElement(antd.Icon, { type: "down" }))))));
     };
     VSelect.prototype.onVisibleChange = function (visible) {
+        var _this = this;
         if (visible === this.state.visible) {
             return;
         }
         if (visible) {
-            var ref_1 = this.inputRef.current;
-            if (ref_1) {
-                setTimeout(function () { return ref_1.focus(); });
-            }
+            setTimeout(function () {
+                var ref = _this.inputRef.current;
+                if (ref) {
+                    ref.focus();
+                }
+            });
             this.setState({ isEdit: true });
         }
         else {
