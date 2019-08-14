@@ -1,3 +1,12 @@
+## [0.1.5](https://github.com/musicq/vi-select/compare/v0.1.4...v0.1.5) (2019-08-14)
+
+
+### Bug Fixes
+
+* fix inputRef can be null sometimes ([225bee9](https://github.com/musicq/vi-select/commit/225bee9))
+
+
+
 ## [0.1.4](https://github.com/musicq/vi-select/compare/v0.1.3...v0.1.4) (2019-01-23)
 
 
