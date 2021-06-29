@@ -23,18 +23,20 @@
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
   },
   "dependencies": {
+    "@types/antd": "^1.0.0",
     "rxjs": "^6.3.3",
     "vist": "^0.2.6"
   },
   "peerDependencies": {
-    "antd": "^4.16.5",
     "@ant-design/icons": "^4.6.2",
+    "antd": "^4.16.5",
     "prop-types": "^15.5.4",
     "react": "^15.0.0 || ^16.0.0",
     "react-dom": "^15.0.0 || ^16.0.0",
     "rxjs": "^6.3.3"
   },
   "devDependencies": {
+    "@ant-design/icons": "^4.6.2",
     "@svgr/rollup": "^2.4.1",
     "@types/jest": "^23.1.5",
     "@types/react": "^16.3.13",

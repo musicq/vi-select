@@ -1,4 +1,5 @@
-import { Dropdown, Icon, Input } from 'antd';
+import { CloseCircleFilled, DownOutlined } from "@ant-design/icons";
+import { Dropdown, Input } from "antd";
 import * as React from 'react';
 import { ChangeEvent, MouseEvent, ReactNode } from 'react';
 import { BehaviorSubject, combineLatest, Observable, Subject, Subscription } from 'rxjs';
@@ -205,11 +206,11 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
 
             {isShowClearBtn && (
               <span className="ant-select-selection__clear" onClick={this.clearValue}>
-                <Icon type="close-circle" theme="filled" className="ant-select-clear-icon"/>
+                <CloseCircleFilled />
               </span>
             )}
             <span className={['ant-select-arrow', style.VSelectArrow].join(' ')}>
-              <Icon type="down"/>
+              <DownOutlined/>
             </span>
           </div>
         </div>
