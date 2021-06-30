@@ -1,7 +1,7 @@
 import {Button} from 'antd'
 import 'antd/dist/antd.css'
 import React, {Component} from 'react'
-import {VSelect} from 'vi-select2'
+import {VSelect} from 'vi-select'
 
 const array = new Array(100).fill(0).map((_, i) => i)
 

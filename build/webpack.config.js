@@ -14,7 +14,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
     alias: {
-      'vi-select2': outputPath()
+      'vi-select': outputPath()
     },
     modules: [rootPath('node_modules'), examplePath('node_modules')]
   },

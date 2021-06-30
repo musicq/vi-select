@@ -12,6 +12,7 @@ import {
 import style from './styles.css'
 import {Vlist} from './Vlist'
 import {distinctUntilChanged, map} from 'rxjs/operators'
+import {classnames} from './classnames'
 
 export interface IVSelectProps<T> {
   placeholder?: string;
@@ -45,7 +46,8 @@ interface IVSelectState<T> {
   index: number;
 }
 
-export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<T>> {
+export class VSelect<T>
+  extends React.Component<IVSelectProps<T>, IVSelectState<T>> {
   state = {
     value: undefined,
     isEdit: false,
@@ -58,7 +60,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     index: 0,
   }
 
-  private _sub: Subscription[] = []
+  private _sub = new Subscription()
   private inputRef = React.createRef<Input>()
   private changingValue$ = new BehaviorSubject<string>('')
   private data$!: Observable<T[]>
@@ -74,7 +76,10 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
     this.onRefresh = this.onRefresh.bind(this)
   }
 
-  static getDerivedStateFromProps<T>(props: IVSelectProps<T>, state: IVSelectState<T>) {
+  static getDerivedStateFromProps<T>(
+    props: IVSelectProps<T>,
+    state: IVSelectState<T>,
+  ) {
     // if props value has change, then change the state value
     if (props.value !== state.inputValue) {
       state.inputValue = props.value
@@ -114,7 +119,10 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
 
   private static updateIndex<T>(props: IVSelectProps<T>) {
     // if cannot get the value, use the given value
-    const [v, index] = VSelect.getValueAndIndex<T>(props.value, props.dataSource, props.keyProp, props.displayProp)
+    const [v, index] = VSelect.getValueAndIndex<T>(props.value,
+      props.dataSource,
+      props.keyProp,
+      props.displayProp)
 
     return {
       value: v || props.value,
@@ -123,7 +131,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
   }
 
   componentDidMount(): void {
-    this._sub.push(
+    this._sub.add(
       this.changingValue$.subscribe(v => this.setState({changingValue: v})),
     )
 
@@ -131,31 +139,36 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
       this.state.dataSource$,
       this.changingValue$.pipe(distinctUntilChanged()),
     ]).pipe(
-      map(([dataSource, changingValue]) => changingValue ? dataSource.filter(source => {
-        const item = this.props.displayProp ? source[this.props.displayProp] : source
-        return (item as any).toString().toLowerCase().includes(changingValue.toString().toLowerCase())
-      }) : dataSource),
+      map(([dataSource, changingValue]) => changingValue ? dataSource.filter(
+        source => {
+          const item = this.props.displayProp ? source[this.props.displayProp] : source
+          return (item as any).toString()
+            .toLowerCase()
+            .includes(changingValue.toString().toLowerCase())
+        }) : dataSource),
     )
   }
 
   componentWillUnmount(): void {
-    this._sub.forEach(s => s.unsubscribe())
+    this._sub.unsubscribe()
   }
 
   render() {
     const isShowPlaceholder = this.state.value !== undefined || this.state.changingValue ? 'none' : 'block'
     const isShowValuePlaceholder = this.state.value !== undefined && !this.state.changingValue ? 'block' : 'none'
     const isShowInput = this.state.isEdit ? 'block' : 'none'
-    const isShowClearBtn = this.props.allowClear && this.state.value
+    const isShowClearBtn = this.props.allowClear && this.state.value && !this.props.disabled
 
-    const cls = [
+    const cls = classnames(
       this.props.className,
       'ant-select',
       this.props.disabled ? 'ant-select-disabled' : 'ant-select-enabled',
-      this.props.allowClear ? 'ant-select-allow-clear' : '',
-      this.state.visible ? 'ant-select-open ant-select-focused' : '',
-      this.state.visible ? style.VSelectOpen : '',
-    ].join(' ')
+      {
+        'ant-select-allow-clear': this.props.allowClear,
+        'ant-select-open ant-select-focused': this.state.visible,
+        [style.VSelectOpen]: this.state.visible,
+      },
+    )
 
     const showAction = this.props.disabled ? [] : ['click']
 
@@ -207,7 +220,8 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
                     style={{display: isShowInput}}>
                   <Input
                     ref={this.inputRef}
-                    className={['ant-select-selection-search-input', style.VSelectInput].join(' ')}
+                    className={classnames('ant-select-selection-search-input',
+                      style.VSelectInput)}
                     value={this.state.changingValue}
                     onChange={this.onInput}
                   />
@@ -220,7 +234,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
               </span>
             )}
             <span
-              className={['ant-select-arrow', style.VSelectArrow].join(' ')}>
+              className={classnames('ant-select-arrow', style.VSelectArrow)}>
               <DownOutlined/>
             </span>
           </div>
@@ -274,6 +288,7 @@ export class VSelect<T> extends React.Component<IVSelectProps<T>, IVSelectState<
   }
 
   private clearValue(e: MouseEvent) {
+    if (this.props.disabled) return
     // stop popup
     e.stopPropagation()
 

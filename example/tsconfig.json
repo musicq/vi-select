@@ -4,7 +4,7 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "vi-select2": [
+      "vi-select": [
         "../src"
       ]
     }

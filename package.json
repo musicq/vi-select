@@ -1,5 +1,5 @@
 {
-  "name": "@musicq/vi-select2",
+  "name": "vi-select",
   "version": "1.0.0",
   "scripts": {
     "start": "webpack-dev-server --config build/webpack.config.js",
