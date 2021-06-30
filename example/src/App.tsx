@@ -1,39 +1,39 @@
-import { Button } from 'antd';
-import 'antd/dist/antd.css';
-import React, { Component } from 'react';
-import { VSelect } from 'vi-select';
+import {Button} from 'antd'
+import 'antd/dist/antd.css'
+import React, {Component} from 'react'
+import {VSelect} from 'vi-select2'
 
-const array = new Array(100).fill(0).map((_, i) => i);
+const array = new Array(100).fill(0).map((_, i) => i)
 
-export default class App extends Component {
+export class App extends Component {
   state = {
     placeholder: '搜索框',
     value: 36,
     disabled: false,
-    data: []
-  };
+    data: [],
+  }
 
-  onChange = e => {
-    console.log('You selected', e);
-    this.setState({ value: e });
-  };
+  onChange = (e: any) => {
+    console.log('You selected', e)
+    this.setState({value: e})
+  }
 
   componentDidMount() {
     fetch('https://jsonplaceholder.typicode.com/comments')
       .then(res => res.json())
-      .then(data => this.setState({ data }))
-      .catch(e => console.error(e));
+      .then(data => this.setState({data}))
+      .catch(e => console.error(e))
   }
 
   render() {
     return (
-      <div style={{ width: 500, margin: '200px auto' }}>
-        <div style={{ marginBottom: 20 }}>
+      <div style={{width: 500, margin: '200px auto'}}>
+        <div style={{marginBottom: 20}}>
           <Button.Group>
             <Button
               onClick={() =>
                 this.setState({
-                  placeholder: 'placeholder: ' + Math.random().toString(36)
+                  placeholder: 'placeholder: ' + Math.random().toString(36),
                 })
               }
             >
@@ -41,16 +41,16 @@ export default class App extends Component {
             </Button>
             <Button
               onClick={() =>
-                this.setState({ value: 'value: ' + Math.random().toString(36) })
+                this.setState({value: 'value: ' + Math.random().toString(36)})
               }
             >
               Change Value
             </Button>
-            <Button onClick={() => this.setState({ value: undefined })}>
+            <Button onClick={() => this.setState({value: undefined})}>
               Clear
             </Button>
             <Button
-              onClick={() => this.setState({ disabled: !this.state.disabled })}
+              onClick={() => this.setState({disabled: !this.state.disabled})}
             >
               Toggle Disabled
             </Button>
@@ -65,16 +65,16 @@ export default class App extends Component {
           displayProp="email"
           onChange={this.onChange}
           itemHeight={60}
-          style={{ width: 300 }}
+          style={{width: 300}}
           allowClear={true}
           disabled={this.state.disabled}
         >
-          {item => (
+          {(item: any) => (
             <div>
-              <div style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>
+              <div style={{textOverflow: 'ellipsis', overflow: 'hidden'}}>
                 {item.id} - {item.email}
               </div>
-              <div style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>
+              <div style={{textOverflow: 'ellipsis', overflow: 'hidden'}}>
                 {item.name}
               </div>
             </div>
@@ -84,13 +84,13 @@ export default class App extends Component {
         <VSelect
           dataSource={array}
           onChange={this.onChange}
-          style={{ width: 300, marginTop: 20 }}
+          style={{width: 300, marginTop: 20}}
           disabled={this.state.disabled}
           value={this.state.value}
         >
-          {item => <p>{item}</p>}
+          {(item: any) => <p>{item}</p>}
         </VSelect>
       </div>
-    );
+    )
   }
 }
