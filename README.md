@@ -1,86 +1,52 @@
-# vi-select
+# vi-select2
 
-> select component using virtual list - antd special
+A React library template which integrated all the things you need.
 
-[![NPM](https://img.shields.io/npm/v/vi-select.svg)](https://www.npmjs.com/package/vi-select)
+## Functionalities
 
-## Install
+- Build library code
+- Run testing site
+- TypeScript
+- Code formatter
+- Code linter
+- Testing environment
 
-```bash
-npm install --save vi-select
-```
+## Getting start
 
-## Usage
+```shell
+# Clone the repo.
+git clone https://github.com/musicq/vi-select2.git
 
-```javascript
-import React from "react";
-import { VSelect } from "vi-select";
+# install dependencies
+yarn
 
-const array = new Array(100).fill(0).map((_, i) => i);
+# install example dependencies
+cd example && yarn
 
-class App extends React.Component {
-  state = {
-    value: "02555346"
-  };
+# back to root path
+cd ..
 
-  onChange = e => {
-    console.log("You selected", e);
-    this.setState({ value: e });
-  };
-
-  render() {
-    return (
-      <VSelect
-        dataSource={array}
-        onChange={this.onChange}
-        style={{ width: 300, marginTop: 20 }}
-        value={this.state.value}
-      >
-        {item => <p>{item}</p>}
-      </VSelect>
-    );
-  }
-}
-```
-
-## Props
-
-| Property      | Type                | Description                                             |
-| ------------- | ------------------- | ------------------------------------------------------- |
-| `dataSource`  | `any[]`             | Data source of the select list.                         |
-| `placeholder` | `string`?           | Placeholder of select input.                            |
-| `value`       | `string \| number`? | Value of select.                                        |
-| `onChange`    | `(v?: T) => void`?  | Call after select changed.                              |
-| `keyProp`     | `any`?              | Use to identify which property should be used as value. |
-| `displayProp` | `any`?              | Which property should be used to show in the input box. |
-| `style`       | `any`?              | Style of select container.                              |
-| `className`   | `string`?           | Class of select container.                              |
-| `itemHeight`  | `number`?           | Height of each list item, default is `32px`.            |
-| `allowClear`  | `boolean`?          | Switch for the clear btn.                               |
-| `disabled`    | `boolean`?          | Disabled select.                                        |
-| `emptyTpl`    | `ReactNode`?        | Empty template when not data.                           |
-
-
-## Development
-
-#### install dependencies
-
-```bash
-cd vi-select && yarn
-```
-
-#### build code
-
-```bash
+# compile library code
 yarn build
+
+# start another window to run testing portal
+yarn start
 ```
 
-#### see the examples
+### Build library
 
-```bash
-cd vi-select/example && yarn start
+```shell
+yarn build
+
+# or watching
+yarn build:w
 ```
 
-## License
+### Test
 
-MIT © [musicq](https://github.com/musicq)
+```shell
+yarn test
+
+# or watching
+yarn test:w
+```
