@@ -4,6 +4,7 @@ import {BehaviorSubject, Observable, Subscription} from 'rxjs'
 import {delay, map, throttleTime} from 'rxjs/operators'
 import {IVirtualListOptions, VirtualList} from 'vist'
 import style from './styles.css'
+import {classnames} from './classnames'
 
 interface IVlistProps<T> {
   data$: Observable<T[]>;
@@ -23,7 +24,8 @@ interface IVlistState {
   isEmpty: boolean;
 }
 
-export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
+export class Vlist<T>
+  extends React.Component<Readonly<IVlistProps<T>>, IVlistState> {
   state = {
     options: {height: this.props.itemHeight || 32, resize: false, spare: 10},
     options$: new BehaviorSubject<IVirtualListOptions>({height: this.props.itemHeight || 32}),
@@ -31,7 +33,7 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
   }
 
   private readonly options$: Observable<IVirtualListOptions>
-  private _sub: Subscription[] = []
+  private _sub = new Subscription()
 
   constructor(props: any) {
     super(props)
@@ -42,7 +44,10 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
     this.options$ = this.state.options$.pipe(throttleTime(10))
   }
 
-  static getDerivedStateFromProps<T>(props: IVlistProps<T>, state: IVlistState) {
+  static getDerivedStateFromProps<T>(
+    props: IVlistProps<T>,
+    state: IVlistState,
+  ) {
     const options = {...state.options}
     let changed = false
 
@@ -68,13 +73,13 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
   }
 
   componentDidMount(): void {
-    this._sub.push(
+    this._sub.add(
       this.props.data$.pipe(
         map(data => !Boolean(data.length)),
       ).subscribe(isEmpty => this.setState({isEmpty})),
     )
 
-    this._sub.push(
+    this._sub.add(
       this.props.refresh$
         .pipe(delay(1))
         .subscribe(() => this.state.options$.next(this.state.options)),
@@ -82,7 +87,7 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
   }
 
   componentWillUnmount(): void {
-    this._sub.forEach(s => s.unsubscribe())
+    this._sub.unsubscribe()
   }
 
   render() {
@@ -115,12 +120,11 @@ export class Vlist<T> extends React.Component<IVlistProps<T>, IVlistState> {
     )
   }
 
-  private getItemClassName<T>(item: T) {
+  private getItemClassName<T extends { [key: string]: any }>(item: T) {
     const clsName =
-      // @ts-ignore
       (this.props.keyProp ? item[this.props.keyProp] : item) === this.props.value ? style.VListItemActivated : ''
 
-    return [clsName, style.VlistItem].join(' ')
+    return classnames(clsName, style.VlistItem)
   }
 
   private onSelect(e: T) {
