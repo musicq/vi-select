@@ -1,6 +1,13 @@
 {
   "name": "vi-select",
-  "version": "1.0.0",
+  "version": "0.1.5",
+  "description": "select component using virtual list - antd special",
+  "author": "musicq",
+  "license": "MIT",
+  "repository": "musicq/vi-select",
+  "main": "./dist/index.js",
+  "module": "dist/index.es.js",
+  "jsnext:main": "dist/index.es.js",
   "scripts": {
     "start": "webpack-dev-server --config build/webpack.config.js",
     "cleanup": "rimraf dist",
@@ -11,16 +18,21 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "cypress open"
   },
-  "main": "./dist/index.js",
   "files": [
     "dist"
   ],
-  "license": "MIT",
   "peerDependencies": {
     "react": ">= 16.9",
-    "react-dom": ">= 16.9"
+    "react-dom": ">= 16.9",
+    "@ant-design/icons": "^4.6.2",
+    "antd": "^4.16.6"
+  },
+  "dependencies": {
+    "rxjs": "^6.6.7",
+    "vist": "^0.3.0"
   },
   "devDependencies": {
+    "@musicq/just-prettier-config": "^1.0.0",
     "@rollup/plugin-replace": "^2.3.4",
     "@rollup/plugin-typescript": "^8.1.0",
     "@testing-library/jest-dom": "^5.11.8",
@@ -54,12 +66,5 @@
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
-  },
-  "dependencies": {
-    "@ant-design/icons": "^4.6.2",
-    "@musicq/just-prettier-config": "^1.0.0",
-    "antd": "^4.16.6",
-    "rxjs": "^6.6.7",
-    "vist": "^0.3.0"
   }
 }

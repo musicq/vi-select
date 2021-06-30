@@ -2,8 +2,11 @@ import typescript from '@rollup/plugin-typescript'
 import replace from '@rollup/plugin-replace'
 import postcss from 'rollup-plugin-postcss'
 import {terser} from 'rollup-plugin-terser'
+import pkg from '../package.json'
 
 const {outputPath, sourcePath} = require('./paths')
+
+const external = Object.keys(pkg.peerDependencies)
 
 export const rollupConfigFactory = env => {
   const isProd = env === 'production'
@@ -12,12 +15,18 @@ export const rollupConfigFactory = env => {
     input: sourcePath('index.ts'),
     output: [
       {
-        file: outputPath('index.js'),
+        file: outputPath('index.es.js'),
         format: 'es',
         sourcemap: true
-      }
+      },
+      {
+        file: outputPath('index.js'),
+        format: 'cjs',
+        exports: 'named',
+        sourcemap: true
+      },
     ],
-    external: ['react', 'react-dom'],
+    external,
     plugins: [
       typescript(),
       replace({
